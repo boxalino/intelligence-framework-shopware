@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <!-- Generic Page  -->
+        <service id="boxalino.api.content.page.response" class="Boxalino\IntelligenceFramework\Framework\Content\Page\ApiResponsePage"/>
+
+        <!-- Generic Api content loader on the page -->
+        <service id="boxalino.api.content.page.loader" class="Boxalino\IntelligenceFramework\Framework\Content\Page\ApiPageLoader" shared="false">
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+            <argument type="service" id="Boxalino\IntelligenceFramework\Service\Api\ApiCallServiceInterface"/>
+            <argument type="service" id="boxalino.api.util.configurator"/>
+            <argument type="service" id="event_dispatcher"/>
+        </service>
+
+        <!-- Shopware6 collection EntitySearchResult service -->
+        <service id="boxalino.api.content.collection" class="Boxalino\IntelligenceFramework\Framework\Content\CollectionDataProvider"
+                 public="true" shared="false">
+            <argument type="service" id="sales_channel.product.repository"/>
+            <argument type="service" id="monolog.logger.boxalino"/>
+        </service>
+    </services>
+
+</container>

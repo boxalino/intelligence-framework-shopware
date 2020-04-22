@@ -1,0 +1,226 @@
+<?php declare(strict_types=1);
+namespace Boxalino\IntelligenceFramework\Framework\Request;
+
+use Boxalino\IntelligenceFramework\Framework\SalesChannelContextTrait;
+use Boxalino\IntelligenceFramework\Service\Api\Request\ContextInterface;
+use Boxalino\IntelligenceFramework\Service\Api\Request\ParameterFactory;
+use Boxalino\IntelligenceFramework\Service\Api\Request\RequestDefinitionInterface;
+use Boxalino\IntelligenceFramework\Service\Api\Request\RequestTransformerInterface;
+use Boxalino\IntelligenceFramework\Service\ErrorHandler\MissingDependencyException;
+use GuzzleHttp\Client;
+use JsonSerializable;
+use Psr\Http\Message\RequestInterface;
+use Shopware\Core\Content\Product\Aggregate\ProductVisibility\ProductVisibilityDefinition;
+use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceInterface;
+use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Symfony\Component\HttpFoundation\Request;
+
+/**
+ * Class ContextAbstract
+ * System-specific request context definition
+ * Builds the request with the use of the request definitions entities and the use of the request transformer
+ *
+ * @package Boxalino\IntelligenceFramework\Framework\Request
+ */
+abstract class ContextAbstract implements ShopwareApiContextInterface
+{
+
+    use SalesChannelContextTrait;
+
+    /**
+     * @var RequestDefinitionInterface
+     */
+    protected $apiRequest;
+
+    /**
+     * @var ParameterFactory
+     */
+    protected $parameterFactory;
+
+    /**
+     * @var RequestTransformerInterface
+     */
+    protected $requestTransformer;
+
+    /**
+     * @var string
+     */
+    protected $widget;
+
+    /**
+     * @var bool
+     */
+    protected $orFilters = false;
+
+    /**
+     * @var int
+     */
+    protected $hitCount;
+
+    /**
+     * @var int
+     */
+    protected $offset;
+
+    /**
+     * @var string
+     */
+    protected $groupBy = "id";
+
+    /**
+     * Listing constructor.
+     *
+     * @param RequestTransformerInterface $requestTransformer
+     * @param ParameterFactory $parameterFactory
+     */
+    public function __construct(
+        RequestTransformerInterface $requestTransformer,
+        ParameterFactory $parameterFactory
+    ) {
+        $this->requestTransformer = $requestTransformer;
+        $this->parameterFactory = $parameterFactory;
+    }
+
+    /**
+     * @param Request $request
+     * @return RequestDefinitionInterface
+     */
+    public function get(Request $request) : RequestDefinitionInterface
+    {
+        if(!$this->salesChannelContext)
+        {
+            throw new MissingDependencyException(
+                "BoxalinoAPI: the SalesChannelContext has not been set on the ContextDefinition"
+            );
+        }
+        $this->requestTransformer->setRequestDefinition($this->getApiRequest())
+            ->setSalesChannelContext($this->salesChannelContext)
+            ->transform($request);
+
+        $this->setRequestDefinition($this->requestTransformer->getRequestDefinition());
+        $this->getApiRequest()
+            ->setReturnFields($this->getReturnFields())
+            ->setGroupBy($this->getGroupBy())
+            ->setWidget($this->getWidget())
+            ->addFilters(
+                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FILTER)->add("category_id", $this->getContextNavigationId($request, $this->salesChannelContext)),
+                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FILTER)->addRange("products_visibility", $this->getContextVisibility(),1000),
+                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FILTER)->add("products_active", [1])
+            );
+
+        return $this->getApiRequest();
+    }
+
+    abstract function getContextNavigationId(Request $request, SalesChannelContext $salesChannelContext): array;
+    abstract function getContextVisibility() : int;
+    abstract function getReturnFields() : array;
+
+    /**
+     * @param string $widget
+     * @return $this
+     */
+    public function setWidget(string $widget)
+    {
+        $this->widget = $widget;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getWidget() : string
+    {
+        return $this->widget;
+    }
+
+    /**
+     * @return RequestDefinitionInterface
+     */
+    public function getApiRequest() : RequestDefinitionInterface
+    {
+        return $this->apiRequest;
+    }
+
+    /**
+     * @param RequestDefinitionInterface $requestDefinition
+     * @return $this
+     */
+    public function setRequestDefinition(RequestDefinitionInterface $requestDefinition)
+    {
+        $this->apiRequest = $requestDefinition;
+        return $this;
+    }
+
+    /**
+     * @param bool $orFilters
+     * @return ContextAbstract
+     */
+    public function setOrFilters(bool $orFilters) : self
+    {
+        $this->orFilters = $orFilters;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getOrFilters(): bool
+    {
+        return $this->orFilters;
+    }
+
+    /**
+     * @param string $groupBy
+     * @return ContextAbstract
+     */
+    public function setGroupBy(string $groupBy) : self
+    {
+        $this->groupBy = $groupBy;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGroupBy() : string
+    {
+        return $this->groupBy;
+    }
+
+    /**
+     * @return int
+     */
+    public function getHitCount(): int
+    {
+        return $this->hitCount;
+    }
+
+    /**
+     * @param int $hitCount
+     * @return ContextAbstract
+     */
+    public function setHitCount(int $hitCount) : self
+    {
+        $this->hitCount = $hitCount;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getOffset(): int
+    {
+        return $this->offset;
+    }
+
+    /**
+     * @param int $offset
+     * @return ContextAbstract
+     */
+    public function setOffset(int $offset) : self
+    {
+        $this->offset = $offset;
+        return $this;
+    }
+
+}

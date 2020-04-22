@@ -1,0 +1,34 @@
+{
+    "name": "boxalino/intelligence-framework-shopware",
+    "type": "shopware-platform-plugin",
+    "description": "Boxalino Intelligence Framework",
+    "license": "proprietary",
+    "version": "0.0.1",
+    "authors": [
+        {
+            "name": "Boxalino AG",
+            "role": "Manufacturer",
+            "email": "support@boxalino.com",
+            "homepage": "http://www.boxalino.com/"
+        }
+    ],
+    "extra": {
+        "installer-paths": {
+            "custom/plugins/BoxalinoIntelligenceFramework": ["boxalino/intelligence-framework-shopware", "vendor/package"]
+        },
+        "shopware-plugin-class": "Boxalino\\IntelligenceFramework\\BoxalinoIntelligenceFramework",
+        "copyright": "Boxalino AG, 2020",
+        "label": {
+            "de-DE": "Boxalino Intelligence Framework für Shopware v6",
+            "en-GB": "Boxalino Intelligence Framework for Shopware v6"
+        }
+    },
+    "require": {
+        "php": "^7.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Boxalino\\IntelligenceFramework\\": "src/"
+        }
+    }
+}
