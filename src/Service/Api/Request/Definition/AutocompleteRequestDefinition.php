@@ -9,7 +9,7 @@ use Boxalino\IntelligenceFramework\Service\Api\Request\RequestDefinition;
  * @package Boxalino\IntelligenceFramework\Service\Api
  */
 class AutocompleteRequestDefinition extends RequestDefinition
-    implements AutocompleteContextRequestDefinitionInterface
+    implements AutocompleteRequestDefinitionInterface
 {
     /**
      * @var int

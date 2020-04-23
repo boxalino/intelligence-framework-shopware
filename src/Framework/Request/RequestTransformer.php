@@ -2,6 +2,7 @@
 namespace Boxalino\IntelligenceFramework\Framework\Request;
 
 use Boxalino\IntelligenceFramework\Framework\SalesChannelContextTrait;
+use Boxalino\IntelligenceFramework\Service\Api\ApiCookieSubscriber;
 use Boxalino\IntelligenceFramework\Service\Api\Request\ParameterFactory;
 use Boxalino\IntelligenceFramework\Service\Api\Request\RequestDefinitionInterface;
 use Boxalino\IntelligenceFramework\Service\Api\Request\RequestTransformerInterface;
@@ -15,8 +16,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\PlatformRequest;
 use Shopware\Core\SalesChannelRequest;
 use Symfony\Component\HttpFoundation\Request;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Symfony\Component\HttpFoundation\Cookie;
 
 /**
  * Class RequestTransformer
@@ -150,13 +149,13 @@ class RequestTransformer implements RequestTransformerInterface
      */
     public function getSessionId(Request $request)
     {
-        if($request->cookies->has("cems"))
+        if($request->cookies->has(ApiCookieSubscriber::BOXALINO_API_COOKIE_SESSION))
         {
-            return $request->cookies->get("cems");
+            return $request->cookies->get(ApiCookieSubscriber::BOXALINO_API_COOKIE_SESSION);
         }
 
         $cookieValue = Uuid::uuid4()->toString();
-        $request->cookies->set("cems", $cookieValue);
+        $request->cookies->set(ApiCookieSubscriber::BOXALINO_API_INIT_SESSION, $cookieValue);
 
         return $cookieValue;
     }
@@ -166,13 +165,13 @@ class RequestTransformer implements RequestTransformerInterface
      */
     public function getProfileId(Request $request)
     {
-        if($request->cookies->has("cemv"))
+        if($request->cookies->has(ApiCookieSubscriber::BOXALINO_API_COOKIE_VISITOR))
         {
-            return $request->cookies->get("cemv");
+            return $request->cookies->get(ApiCookieSubscriber::BOXALINO_API_COOKIE_VISITOR);
         }
 
         $cookieValue = Uuid::uuid4()->toString();
-        $request->cookies->set("cemv", $cookieValue);
+        $request->cookies->set(ApiCookieSubscriber::BOXALINO_API_INIT_VISITOR, $cookieValue);
 
         return $cookieValue;
     }
@@ -250,7 +249,7 @@ class RequestTransformer implements RequestTransformerInterface
 
         $this->requestDefinition->addSort(
             $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_SORT)
-            ->add($this->getFieldName($field), $reverse)
+                ->add($this->getFieldName($field), $reverse)
         );
     }
 

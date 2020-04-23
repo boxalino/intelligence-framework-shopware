@@ -36,6 +36,11 @@
             <argument type="service" id="Boxalino\IntelligenceFramework\Service\Api\Response\ResponseDefinitionInterface" />
         </service>
 
+        <!-- Setting the API cookie -->
+        <service id="Boxalino\IntelligenceFramework\Service\Api\ApiCookieSubscriber">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <!-- Generic interfaces required to be extended and implemented -->
         <service id="Boxalino\IntelligenceFramework\Service\Api\Request\RequestTransformerInterface"/>
         <service id="Boxalino\IntelligenceFramework\Service\Api\Request\ContextInterface"/>
@@ -55,7 +60,6 @@
             <argument type="service" id="boxalino.api.request.transformer"/>
             <argument type="service" id="boxalino.api.request.parameter.factory"/>
         </service>
-
     </services>
 
 </container>

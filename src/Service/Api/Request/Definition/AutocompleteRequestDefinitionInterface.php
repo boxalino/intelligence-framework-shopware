@@ -8,7 +8,7 @@ use Boxalino\IntelligenceFramework\Service\Api\Request\RequestDefinitionInterfac
  *
  * @package Boxalino\IntelligenceFramework\Service\Api\Request
  */
-interface AutocompleteContextRequestDefinitionInterface extends RequestDefinitionInterface
+interface AutocompleteRequestDefinitionInterface extends RequestDefinitionInterface
 {
     /**
      * @param bool $highlight

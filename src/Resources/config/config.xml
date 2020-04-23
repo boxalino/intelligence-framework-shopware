@@ -58,26 +58,13 @@
         </input-field>
     </card>
     <card>
-        <title>Advanced</title>
-        <input-field type="text">
-            <name>entityIdField</name>
-            <label>ID Field Name</label>
-            <helpText>Optional: specify special field name for search and recommendation grouping.</helpText>
-        </input-field>
-        <input-field type="text">
-            <name>returnFields</name>
-            <label>Returned Fields</label>
-            <helpText>Optional: Write here comma-separated names of fields in Boxalino response. Colon separate option: global (without language version), local (with language version)</helpText>
-        </input-field>
-    </card>
-    <card>
         <title>Exporter</title>
         <input-field type="bool">
             <name>export</name>
             <defaultValue>0</defaultValue>
             <label>Exporter Status</label>
         </input-field>
-        <input-field type="string">
+        <input-field type="text">
             <name>password</name>
             <label>Password</label>
             <helpText>Please request your account with credentials by contacting support@boxalino.com.</helpText>
