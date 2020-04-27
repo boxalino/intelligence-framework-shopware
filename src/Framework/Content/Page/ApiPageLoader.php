@@ -87,6 +87,7 @@ class ApiPageLoader
         $page->setVariantUuid($this->apiCallService->getApiResponse()->getVariantId());
         $page->setHasSearchSubPhrases($this->apiCallService->getApiResponse()->hasSearchSubPhrases());
         $page->setRedirectUrl($this->apiCallService->getApiResponse()->getRedirectUrl());
+        $page->setTotalHitCount($this->apiCallService->getApiResponse()->getHitCount());
 
         $this->eventDispatcher->dispatch(
             new ApiPageLoadedEvent($page, $salesChannelContext, $request)

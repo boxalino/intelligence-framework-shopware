@@ -2,7 +2,9 @@
 namespace Boxalino\IntelligenceFramework\Service\Api\Response;
 
 use Boxalino\IntelligenceFramework\Service\Api\Response\Accessor\AccessorInterface;
+use Boxalino\IntelligenceFramework\Service\Api\Response\Accessor\Block;
 use Boxalino\IntelligenceFramework\Service\Api\Util\AccessorHandlerInterface;
+use Boxalino\IntelligenceFramework\Service\ErrorHandler\UndefinedPropertyError;
 
 /**
  * Class ResponseHydratorTrait
@@ -74,6 +76,65 @@ trait ResponseHydratorTrait
         }
 
         return $object;
+    }
+
+
+    /**
+     * Find the block that has a property set
+     *
+     * @param $block
+     * @param string $property
+     * @return AccessorInterface|null
+     */
+    public function findObjectWithProperty($block, string $property) : ?AccessorInterface
+    {
+        $response = null;
+        if($block instanceof Block)
+        {
+            try{
+                if($block->get($property))
+                {
+                    $response = $block;
+                }
+            } catch(\Throwable $exception) {
+                foreach($block->getBlocks() as $searchBlock)
+                {
+                    try{
+                        if($searchBlock->get($property))
+                        {
+                            $response = $searchBlock;
+                        }
+                    } catch (\Throwable $exception)
+                    {
+                        try {
+                            foreach ($searchBlock->getBlocks() as $childBlock) {
+                                try {
+                                    $response = $childBlock->findObjectWithProperty($childBlock, $property);
+                                } catch (\Throwable $exception) {
+                                    continue;
+                                }
+                            }
+
+                            if(is_null($response))
+                            {
+                                continue;
+                            }
+
+                            return $response;
+                        } catch (\Throwable $exception) {
+                            continue;
+                        }
+                    }
+
+                    if(is_null($response))
+                    {
+                        continue;
+                    }
+                }
+            }
+        }
+
+        return $response;
     }
 
     /**

@@ -5,9 +5,11 @@ use Boxalino\IntelligenceFramework\Service\Api\Response\Accessor\AccessorInterfa
 use Boxalino\IntelligenceFramework\Service\Api\Response\Accessor\Block;
 use Boxalino\IntelligenceFramework\Service\Api\Util\AccessorHandler;
 use Boxalino\IntelligenceFramework\Service\Api\Util\AccessorHandlerInterface;
+use Boxalino\IntelligenceFramework\Service\ErrorHandler\UndefinedPropertyError;
 use GuzzleHttp\Psr7\Response;
 use Psr\Log\LoggerInterface;
 use Boxalino\IntelligenceFramework\Service\ErrorHandler\UndefinedMethodError;
+use Symfony\Component\Config\Definition\Exception\Exception;
 
 /**
  * Class ResponseDefinition
@@ -50,6 +52,11 @@ class ResponseDefinition implements ResponseDefinitionInterface
      */
     protected $accessorHandler = null;
 
+    /**
+     * @var null | \ArrayIterator
+     */
+    protected $blocks = null;
+
     public function __construct(LoggerInterface $logger, AccessorHandlerInterface $accessorHandler)
     {
         $this->logger = $logger;
@@ -86,7 +93,7 @@ class ResponseDefinition implements ResponseDefinitionInterface
                 }
             }
 
-            throw new UndefinedMethodError("BoxalinoAPI: the requested method $method is not supported by the Boxalino API ResponseServer");
+            throw new UndefinedMethodError("BoxalinoResponseAPI: the requested method $method is not supported by the Boxalino API ResponseServer");
         }
     }
 
@@ -95,7 +102,40 @@ class ResponseDefinition implements ResponseDefinitionInterface
      */
     public function getHitCount() : int
     {
-        return $this->get()->system->mainHitCount ?? $this->get()->system->acSuggestionHitcount ?? 0;
+        try{
+            try {
+                $hitCount = $this->get()->system->mainHitCount;
+                if($hitCount == -1)
+                {
+                    //find the bx-hits block for item-context requests
+                }
+
+                return $hitCount;
+            } catch(\Exception $exception)
+            {
+                foreach($this->getBlocks() as $block)
+                {
+                    try{
+                        $object = $this->findObjectWithProperty($block, "productsCollection");
+                        if(is_null($object))
+                        {
+                            return 0;
+                        }
+
+                        return $object->getProductsCollection()->getTotalHitCount();
+                    } catch (\Exception $exception)
+                    {
+                        $this->logger->info($exception->getMessage());
+                        continue;
+                    }
+                }
+
+                return 0;
+            }
+        } catch(\Exception $exception)
+        {
+            return 0;
+        }
     }
 
     /**
@@ -185,19 +225,22 @@ class ResponseDefinition implements ResponseDefinitionInterface
      */
     public function getBlocks() : \ArrayIterator
     {
-        $blocks = $this->get()->blocks;
-        $content = new \ArrayIterator();
-        try{
-            foreach($blocks as $block)
-            {
-                $content->append($this->getBlockObject($block));
-            }
-        } catch(\Exception $exception)
+        if(is_null($this->blocks))
         {
-            $this->logger->warning("BoxalinoAPI: Something went wrong during BLOCKS generation: " . $exception->getMessage());
+            $this->blocks = new \ArrayIterator();
+            $blocks = $this->get()->blocks;
+            try{
+                foreach($blocks as $block)
+                {
+                    $this->blocks->append($this->getBlockObject($block));
+                }
+            } catch(\Exception $exception)
+            {
+                $this->logger->warning("BoxalinoResponseAPI: Something went wrong during BLOCKS generation: " . $exception->getMessage());
+            }
         }
 
-        return $content;
+        return $this->blocks;
     }
 
     /**

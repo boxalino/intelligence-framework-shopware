@@ -58,10 +58,17 @@ class AccessorHandler implements AccessorHandlerInterface
      * @param string $setter
      * @param string $modelName
      */
-    public function addAccessor(string $type, string $setter, string $modelName)
+    public function addAccessor(string $type, string $setter="", string $modelName="")
     {
-        $this->accessorDefinitions->offsetSet($type, $modelName);
-        $this->accessorSetter->offsetSet($type, $setter);
+        if(!empty($setter))
+        {
+            $this->accessorSetter->offsetSet($type, $setter);
+        }
+
+        if(!empty($modelName))
+        {
+            $this->accessorDefinitions->offsetSet($type, $modelName);
+        }
 
         return $this;
     }
@@ -105,6 +112,15 @@ class AccessorHandler implements AccessorHandlerInterface
         throw new MissingDependencyException(
             "BoxalinoApiAccessor: the accessor does not have a setter defined for $type . Please contact Boxalino."
         );
+    }
+
+    /**
+     * @param string $type
+     * @return bool
+     */
+    public function hasSetter(string $type) : bool
+    {
+        return $this->accessorSetter->offsetExists($type);
     }
 
     /**

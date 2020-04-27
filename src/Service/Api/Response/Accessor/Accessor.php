@@ -3,6 +3,7 @@ namespace Boxalino\IntelligenceFramework\Service\Api\Response\Accessor;
 
 use Boxalino\IntelligenceFramework\Service\Api\Response\ResponseHydratorTrait;
 use Boxalino\IntelligenceFramework\Service\Api\Util\AccessorHandlerInterface;
+use Boxalino\IntelligenceFramework\Service\ErrorHandler\UndefinedPropertyError;
 
 /**
  * @package Boxalino\IntelligenceFramework\Service\Api\Response\Accessor
@@ -31,15 +32,16 @@ class Accessor implements AccessorInterface
     public function __call(string $methodName, $params = null)
     {
         $methodPrefix = substr($methodName, 0, 3);
-        $key = strtolower(substr($methodName, 3));
+        $key = strtolower(substr($methodName, 3, 1)) . substr($methodName, 4);
         if($methodPrefix == 'get')
         {
-            return $this->$key;
+            try{
+                return $this->$key;
+            } catch (\Exception $exception)
+            {
+                throw new UndefinedPropertyError("BoxalinoAPI: the property $key is not available in the " . get_called_class());
+            }
         }
-
-        throw new \BadMethodCallException(
-            "BoxalinoApiAccessor: the accessor does not have a property defined for $key . Please contact Boxalino."
-        );
     }
 
     /**

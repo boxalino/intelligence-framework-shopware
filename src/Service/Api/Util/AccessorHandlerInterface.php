@@ -37,6 +37,12 @@ interface AccessorHandlerInterface
 
     /**
      * @param string $type
+     * @return bool
+     */
+    public function hasSetter(string $type) : bool;
+
+    /**
+     * @param string $type
      * @param string $field
      * @return mixed
      */

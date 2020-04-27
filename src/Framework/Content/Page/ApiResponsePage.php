@@ -51,6 +51,11 @@ class ApiResponsePage extends Page
     protected $redirectUrl;
 
     /**
+     * @var int
+     */
+    protected $totalHitCount = 0;
+
+    /**
      * @return array
      */
     public function getSortings(): array
@@ -189,6 +194,24 @@ class ApiResponsePage extends Page
     public function setRedirectUrl(?string $redirectUrl): ApiResponsePage
     {
         $this->redirectUrl = $redirectUrl;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTotalHitCount(): int
+    {
+        return $this->totalHitCount;
+    }
+
+    /**
+     * @param int $totalHitCount
+     * @return ApiResponsePage
+     */
+    public function setTotalHitCount(int $totalHitCount): ApiResponsePage
+    {
+        $this->totalHitCount = $totalHitCount;
         return $this;
     }
 
