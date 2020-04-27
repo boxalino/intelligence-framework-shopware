@@ -80,7 +80,7 @@
 
         <service id="boxalino.exporter.component.product.price" class="Boxalino\IntelligenceFramework\Service\Exporter\Item\Price" parent="boxalino.exporter.component.item">
             <argument type="service" id="Shopware\Core\Checkout\Cart\Rule\CartAmountRule"/>
-            <argument type="service" id="Shopware\Core\Profiling\Checkout\SalesChannelContextServiceProfiler"/>
+            <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextService"/>
         </service>
 
         <service id="boxalino.exporter.component.product.media" class="Boxalino\IntelligenceFramework\Service\Exporter\Item\Media" parent="boxalino.exporter.component.item">
