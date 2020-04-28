@@ -27,6 +27,13 @@
             <argument type="service" id="monolog.logger.boxalino"/>
         </service>
 
+        <!-- scheduled task sample (has to be triggered in the integration layer) -->
+        <service id="Boxalino\IntelligenceFramework\ScheduledTask\ExporterFullHandlerAbstract" abstract="true">
+            <argument type="service" id="scheduled_task.repository" />
+            <argument type="service" id="monolog.logger.boxalino"/>
+            <argument type="service" id="boxalino.exporter.full"/>
+            <tag name="messenger.message_handler" />
+        </service>
     </services>
 
 </container>
