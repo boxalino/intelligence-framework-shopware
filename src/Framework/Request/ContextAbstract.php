@@ -55,12 +55,12 @@ abstract class ContextAbstract implements ShopwareApiContextInterface
     /**
      * @var int
      */
-    protected $hitCount;
+    protected $hitCount = 0;
 
     /**
      * @var int
      */
-    protected $offset;
+    protected $offset = 0;
 
     /**
      * @var string
@@ -107,6 +107,11 @@ abstract class ContextAbstract implements ShopwareApiContextInterface
                 $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FILTER)->addRange("products_visibility", $this->getContextVisibility(),1000),
                 $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FILTER)->add("products_active", [1])
             );
+
+        if($this->getHitCount())
+        {
+            $this->getApiRequest()->setHitCount($this->getHitCount());
+        }
 
         return $this->getApiRequest();
     }

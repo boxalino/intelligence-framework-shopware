@@ -195,6 +195,10 @@ class RequestTransformer implements RequestTransformerInterface
             );
 
         $queryString = $request->getQueryString();
+        if(is_null($queryString))
+        {
+            return;
+        }
         parse_str($queryString, $params);
         foreach($params as $param => $value)
         {

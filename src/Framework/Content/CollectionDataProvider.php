@@ -40,16 +40,9 @@ class CollectionDataProvider implements AccessorModelInterface
      */
     protected $hitIds;
 
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
     public function __construct(
-        SalesChannelRepositoryInterface $productRepository,
-        LoggerInterface $logger
+        SalesChannelRepositoryInterface $productRepository
     ){
-        $this->logger = $logger;
         $this->productRepository = $productRepository;
     }
 

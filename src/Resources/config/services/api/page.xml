@@ -6,20 +6,29 @@
     <services>
         <!-- Generic Page  -->
         <service id="boxalino.api.content.page.response" class="Boxalino\IntelligenceFramework\Framework\Content\Page\ApiResponsePage"/>
-
-        <!-- Generic Api content loader on the page -->
-        <service id="boxalino.api.content.page.loader" class="Boxalino\IntelligenceFramework\Framework\Content\Page\ApiPageLoader" shared="false">
-            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
+        <service id="Boxalino\IntelligenceFramework\Framework\Content\Page\ApiLoader">
             <argument type="service" id="Boxalino\IntelligenceFramework\Service\Api\ApiCallServiceInterface"/>
             <argument type="service" id="boxalino.api.util.configurator"/>
             <argument type="service" id="event_dispatcher"/>
+        </service>
+
+        <!-- Generic Api content loader on the page -->
+        <service id="boxalino.api.content.page.loader" class="Boxalino\IntelligenceFramework\Framework\Content\Page\ApiPageLoader"
+                 parent="Boxalino\IntelligenceFramework\Framework\Content\Page\ApiLoader" shared="false">
+            <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
         </service>
 
         <!-- Shopware6 collection EntitySearchResult service -->
         <service id="boxalino.api.content.collection" class="Boxalino\IntelligenceFramework\Framework\Content\CollectionDataProvider"
                  public="true" shared="false">
             <argument type="service" id="sales_channel.product.repository"/>
-            <argument type="service" id="monolog.logger.boxalino"/>
+        </service>
+
+        <!-- Shopware6 cross-selling loader extension with API call -->
+        <service id="boxalino.api.content.page.crossselling"
+                 class="Boxalino\IntelligenceFramework\Framework\Content\Page\ApiCrossSellingLoader"
+                 parent="Boxalino\IntelligenceFramework\Framework\Content\Page\ApiLoader" shared="false">
+            <argument type="service" id="sales_channel.product.repository"/>
         </service>
     </services>
 

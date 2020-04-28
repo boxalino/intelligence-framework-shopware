@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <!-- Shopware6 specifically designed elements - connectors to Boxalino Narrative API service -->
+        <service id="Boxalino\IntelligenceFramework\Framework\Request\ShopwareApiContextInterface"/>
+        <service id="boxalino.api.request.transformer" class="Boxalino\IntelligenceFramework\Framework\Request\RequestTransformer"
+                 parent="Boxalino\IntelligenceFramework\Service\Api\Request\RequestTransformerInterface">
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
+            <argument type="service" id="boxalino.api.request.parameter.factory"/>
+            <argument type="service" id="boxalino.api.util.configurator"/>
+            <argument type="service" id="monolog.logger.boxalino"/>
+        </service>
+        <service id="Boxalino\IntelligenceFramework\Framework\Request\ShopwareApiContextInterface"
+                 class="Boxalino\IntelligenceFramework\Framework\Request\ContextAbstract"
+                 parent="Boxalino\IntelligenceFramework\Service\Api\Request\ContextInterface"
+                 abstract="true">
+            <argument type="service" id="boxalino.api.request.transformer"/>
+            <argument type="service" id="boxalino.api.request.parameter.factory"/>
+        </service>
+        <service id="Boxalino\IntelligenceFramework\Service\Api\Request\Context\ItemContextInterface"
+                 class="Boxalino\IntelligenceFramework\Framework\Request\ItemContextAbstract"
+                 parent="Boxalino\IntelligenceFramework\Framework\Request\ShopwareApiContextInterface"
+                 abstract="true">
+        </service>
+        <service id="Boxalino\IntelligenceFramework\Service\Api\Request\Context\AutocompleteContextInterface"
+                 class="Boxalino\IntelligenceFramework\Framework\Request\AutocompleteContextAbstract"
+                 parent="Boxalino\IntelligenceFramework\Framework\Request\ShopwareApiContextInterface"
+                 abstract="true">
+        </service>
+        <service id="Boxalino\IntelligenceFramework\Service\Api\Request\Context\SearchContextInterface"
+                 class="Boxalino\IntelligenceFramework\Framework\Request\SearchContextAbstract"
+                 parent="Boxalino\IntelligenceFramework\Framework\Request\ShopwareApiContextInterface"
+                 abstract="true">
+        </service>
+
+    </services>
+
+</container>

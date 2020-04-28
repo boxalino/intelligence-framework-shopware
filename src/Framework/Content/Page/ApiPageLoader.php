@@ -21,56 +21,43 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @package Boxalino\IntelligenceFramework\Service\Api\Content\Page
  */
-class ApiPageLoader
+class ApiPageLoader extends ApiLoader
 {
 
     /**
      * @var GenericPageLoader
      */
-    private $genericLoader;
-
-    /**
-     * @var ContextInterface
-     */
-    private $apiContextInterface;
-
-    /**
-     * @var ApiCallServiceInterface
-     */
-    private $apiCallService;
-
-    /**
-     * @var Configuration
-     */
-    private $configuration;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
+    protected $genericLoader;
 
     public function __construct(
-        GenericPageLoader $genericLoader,
         ApiCallServiceInterface $apiCallService,
         Configuration $configuration,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        GenericPageLoader $genericLoader
+
     ) {
-        $this->configuration = $configuration;
-        $this->apiCallService = $apiCallService;
+        parent::__construct($apiCallService, $configuration, $eventDispatcher);
         $this->genericLoader = $genericLoader;
-        $this->eventDispatcher = $eventDispatcher;
     }
 
+    /**
+     * Loads the content of an API Response page
+     *
+     * @param Request $request
+     * @param SalesChannelContext $salesChannelContext
+     * @return ApiResponsePage
+     * @throws CategoryNotFoundException
+     * @throws InconsistentCriteriaIdsException
+     * @throws MissingRequestParameterException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public function load(Request $request, SalesChannelContext $salesChannelContext): ApiResponsePage
     {
         $page = $this->genericLoader->load($request, $salesChannelContext);
         $page = ApiResponsePage::createFrom($page);
 
         $this->apiContextInterface->setSalesChannelContext($salesChannelContext);
-        $this->apiCallService->call(
-            $this->apiContextInterface->get($request),
-            $this->configuration->getRestApiEndpoint($salesChannelContext->getSalesChannel()->getId())
-        );
+        $this->call($request, $salesChannelContext);
 
         if($this->apiCallService->isFallback())
         {
@@ -79,12 +66,14 @@ class ApiPageLoader
              */
         }
 
+        /** this is a required step */
         $this->apiCallService->getApiResponse()->getAccessorHandler()->setSalesChannelContext($salesChannelContext);
 
+        /** set page properties */
         $page->setBlocks($this->apiCallService->getApiResponse()->getBlocks());
         $page->setRequestId($this->apiCallService->getApiResponse()->getRequestId());
-        $page->setGroupBy($this->apiCallService->getApiResponse()->getGroupBy());
-        $page->setVariantUuid($this->apiCallService->getApiResponse()->getVariantId());
+        $page->setGroupBy($this->getGroupBy());
+        $page->setVariantUuid($this->getVariantUuid());
         $page->setHasSearchSubPhrases($this->apiCallService->getApiResponse()->hasSearchSubPhrases());
         $page->setRedirectUrl($this->apiCallService->getApiResponse()->getRedirectUrl());
         $page->setTotalHitCount($this->apiCallService->getApiResponse()->getHitCount());
@@ -94,16 +83,6 @@ class ApiPageLoader
         );
 
         return $page;
-    }
-
-    /**
-     * @param ContextInterface $apiContextInterface
-     * @return $this
-     */
-    public function setApiContextInterface(ContextInterface $apiContextInterface)
-    {
-        $this->apiContextInterface = $apiContextInterface;
-        return $this;
     }
 
 }

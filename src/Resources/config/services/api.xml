@@ -6,6 +6,8 @@
     <imports>
         <import resource="api/accessor.xml"/>
         <import resource="api/page.xml"/>
+        <import resource="api/context.xml"/>
+        <import resource="api/definition.xml"/>
     </imports>
 
     <services>
@@ -25,11 +27,11 @@
         <service id="boxalino.api.request.parameter.header" class="Boxalino\IntelligenceFramework\Service\Api\Request\Parameter\HeaderParameterDefinition" parent="boxalino.api.request.parameter.definition" public="true" shared="false"/>
         <service id="boxalino.api.request.parameter.item" class="Boxalino\IntelligenceFramework\Service\Api\Request\Parameter\ItemDefinition" parent="boxalino.api.request.parameter.definition" public="true" shared="false"/>
 
+        <service id="Boxalino\IntelligenceFramework\Service\Api\Request\RequestDefinitionInterface" class="Boxalino\IntelligenceFramework\Service\Api\Request\RequestDefinition"/>
         <service id="Boxalino\IntelligenceFramework\Service\Api\Response\ResponseDefinitionInterface" class="Boxalino\IntelligenceFramework\Service\Api\Response\ResponseDefinition">
             <argument type="service" id="monolog.logger.boxalino"/>
             <argument type="service" id="Boxalino\IntelligenceFramework\Service\Api\Util\AccessorHandlerInterface"/>
         </service>
-        <service id="Boxalino\IntelligenceFramework\Service\Api\Request\RequestDefinitionInterface" class="Boxalino\IntelligenceFramework\Service\Api\Request\RequestDefinition"/>
 
         <service id="Boxalino\IntelligenceFramework\Service\Api\ApiCallServiceInterface" class="Boxalino\IntelligenceFramework\Service\Api\ApiCallService">
             <argument type="service" id="monolog.logger.boxalino"/>
@@ -44,22 +46,5 @@
         <!-- Generic interfaces required to be extended and implemented -->
         <service id="Boxalino\IntelligenceFramework\Service\Api\Request\RequestTransformerInterface"/>
         <service id="Boxalino\IntelligenceFramework\Service\Api\Request\ContextInterface"/>
-
-        <!-- Shopware6 specifically designed elements - connectors to Boxalino Narrative API service -->
-        <service id="Boxalino\IntelligenceFramework\Framework\Request\ShopwareApiContextInterface"/>
-        <service id="boxalino.api.request.transformer" class="Boxalino\IntelligenceFramework\Framework\Request\RequestTransformer"
-                 parent="Boxalino\IntelligenceFramework\Service\Api\Request\RequestTransformerInterface">
-            <argument type="service" id="Doctrine\DBAL\Connection"/>
-            <argument type="service" id="boxalino.api.request.parameter.factory"/>
-            <argument type="service" id="boxalino.api.util.configurator"/>
-            <argument type="service" id="monolog.logger.boxalino"/>
-        </service>
-        <service id="Boxalino\IntelligenceFramework\Framework\Request\ShopwareApiContextInterface" class="Boxalino\IntelligenceFramework\Framework\Request\ContextAbstract"
-                 parent="Boxalino\IntelligenceFramework\Service\Api\Request\ContextInterface"
-                 abstract="true">
-            <argument type="service" id="boxalino.api.request.transformer"/>
-            <argument type="service" id="boxalino.api.request.parameter.factory"/>
-        </service>
     </services>
-
 </container>

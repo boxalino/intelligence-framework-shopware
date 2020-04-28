@@ -71,14 +71,8 @@ class ApiCallService implements ApiCallServiceInterface
                 $apiRequest->jsonSerialize()
             );
 
-            $this->logger->info("=============  REQUEST ================");
-            $this->logger->info($apiRequest->jsonSerialize());
-
             $response = $this->restClient->send($request);
             $this->setApiResponse($this->responseDefinition->setResponse($response));
-
-            $this->logger->info("=============  RESPONSE JSON ================");
-            $this->logger->info($this->getApiResponse()->getJson());
 
             return $this->getApiResponse();
         } catch (\Exception $exception)

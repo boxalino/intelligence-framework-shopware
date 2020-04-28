@@ -104,13 +104,7 @@ class ResponseDefinition implements ResponseDefinitionInterface
     {
         try{
             try {
-                $hitCount = $this->get()->system->mainHitCount;
-                if($hitCount == -1)
-                {
-                    //find the bx-hits block for item-context requests
-                }
-
-                return $hitCount;
+                return $this->get()->system->mainHitCount;
             } catch(\Exception $exception)
             {
                 foreach($this->getBlocks() as $block)
