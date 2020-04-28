@@ -32,7 +32,6 @@
             <argument type="service" id="scheduled_task.repository" />
             <argument type="service" id="monolog.logger.boxalino"/>
             <argument type="service" id="boxalino.exporter.full"/>
-            <tag name="messenger.message_handler" />
         </service>
     </services>
 
