@@ -189,6 +189,21 @@ abstract class ItemsAbstract implements ExporterInterface
     }
 
     /**
+     * @return string
+     * @throws \Exception
+     */
+    protected function getLanguageHeaderConditional() : string
+    {
+        $conditional = [];
+        foreach ($this->getLanguageHeaderColumns() as $column)
+        {
+            $conditional[]= "$column IS NOT NULL ";
+        }
+
+        return implode(" OR " , $conditional);
+    }
+
+    /**
      * @param $query
      * @return \Generator
      */
@@ -324,6 +339,15 @@ abstract class ItemsAbstract implements ExporterInterface
     public function getItemRelationHeaderColumns(array $additionalFields = []) : array
     {
         return [array_merge($additionalFields, [$this->getPropertyIdField(), "product_id"])];
+    }
+
+    /**
+     * @return array
+     * @throws \Exception
+     */
+    public function getLanguageHeaderColumns() : array
+    {
+        return preg_filter('/^/', 'translation.', $this->getLanguageHeaders());
     }
 
     /**

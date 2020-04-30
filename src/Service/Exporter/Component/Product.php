@@ -6,6 +6,7 @@ use Boxalino\IntelligenceFramework\Service\Exporter\Item\ItemsAbstract;
 use Boxalino\IntelligenceFramework\Service\Exporter\Item\Manufacturer;
 use Boxalino\IntelligenceFramework\Service\Exporter\Item\Category;
 use Boxalino\IntelligenceFramework\Service\Exporter\Item\Media;
+use Boxalino\IntelligenceFramework\Service\Exporter\Item\Option;
 use Boxalino\IntelligenceFramework\Service\Exporter\Item\Price;
 use Boxalino\IntelligenceFramework\Service\Exporter\Item\PriceAdvanced;
 use Boxalino\IntelligenceFramework\Service\Exporter\Item\Property;
@@ -53,6 +54,11 @@ class Product extends ExporterComponentAbstract
      * @var Property
      */
     protected $facetExporter;
+
+    /**
+     * @var Option
+     */
+    protected $optionExporter;
 
     /**
      * @var Media
@@ -111,6 +117,7 @@ class Product extends ExporterComponentAbstract
         Configuration $exporterConfigurator,
         Category $categoryExporter,
         Property $facetExporter,
+        Option $optionExporter,
         Media $imagesExporter,
         Manufacturer $manufacturerExporter,
         Price $priceExporter,
@@ -122,6 +129,7 @@ class Product extends ExporterComponentAbstract
         Visibility $visibilityExporter
     ){
         $this->itemExportersList = new \ArrayObject();
+        $this->optionExporter = $optionExporter;
         $this->priceAdvancedExporter = $priceAdvanced;
         $this->categoryExporter = $categoryExporter;
         $this->facetExporter = $facetExporter;
@@ -241,6 +249,7 @@ class Product extends ExporterComponentAbstract
         $this->_exportExtra("translations", $this->translationExporter);
         $this->_exportExtra("manufacturers", $this->manufacturerExporter);
         $this->_exportExtra("facets", $this->facetExporter);
+        $this->_exportExtra("options", $this->optionExporter);
         $this->_exportExtra("prices", $this->priceExporter);
         $this->_exportExtra("advancedPrices", $this->priceAdvancedExporter);
         $this->_exportExtra("reviews", $this->reviewsExporter);

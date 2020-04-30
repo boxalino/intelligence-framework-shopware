@@ -54,6 +54,7 @@
         <service id="boxalino.exporter.component.product" class="Boxalino\IntelligenceFramework\Service\Exporter\Component\Product" parent="boxalino.exporter.component" >
             <argument type="service" id="boxalino.exporter.component.product.category"/>
             <argument type="service" id="boxalino.exporter.component.product.property"/>
+            <argument type="service" id="boxalino.exporter.component.product.option"/>
             <argument type="service" id="boxalino.exporter.component.product.media"/>
             <argument type="service" id="boxalino.exporter.component.product.manufacturer"/>
             <argument type="service" id="boxalino.exporter.component.product.price"/>
@@ -65,8 +66,10 @@
             <argument type="service" id="boxalino.exporter.component.product.visibility"/>
         </service>
 
+        <service id="boxalino.exporter.component.product.property.translation" class="Boxalino\IntelligenceFramework\Service\Exporter\Item\PropertyTranslation" parent="boxalino.exporter.component.item" abstract="true"/>
         <service id="boxalino.exporter.component.product.category" class="Boxalino\IntelligenceFramework\Service\Exporter\Item\Category" parent="boxalino.exporter.component.item" />
-        <service id="boxalino.exporter.component.product.property" class="Boxalino\IntelligenceFramework\Service\Exporter\Item\Property" parent="boxalino.exporter.component.item" />
+        <service id="boxalino.exporter.component.product.property" class="Boxalino\IntelligenceFramework\Service\Exporter\Item\Property" parent="boxalino.exporter.component.product.property.translation" />
+        <service id="boxalino.exporter.component.product.option" class="Boxalino\IntelligenceFramework\Service\Exporter\Item\Option" parent="boxalino.exporter.component.product.property.translation" />
         <service id="boxalino.exporter.component.product.manufacturer" class="Boxalino\IntelligenceFramework\Service\Exporter\Item\Manufacturer" parent="boxalino.exporter.component.item" />
         <service id="boxalino.exporter.component.product.review" class="Boxalino\IntelligenceFramework\Service\Exporter\Item\Review" parent="boxalino.exporter.component.item" />
         <service id="boxalino.exporter.component.product.tag" class="Boxalino\IntelligenceFramework\Service\Exporter\Item\Tag" parent="boxalino.exporter.component.item" />

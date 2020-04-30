@@ -32,7 +32,7 @@ class Media extends ItemsAbstract
     protected $mediaUrlGenerator;
 
     /**
-     * @var MediaRepository
+     * @var EntityRepositoryInterface
      */
     protected $mediaRepository;
 
@@ -146,6 +146,5 @@ class Media extends ItemsAbstract
             "LOWER(HEX(product_media.product_id)) AS product_id"
         ];
     }
-
 
 }

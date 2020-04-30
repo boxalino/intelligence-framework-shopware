@@ -7,6 +7,12 @@ use Shopware\Core\Defaults;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Shopware\Core\Framework\Uuid\Uuid;
 
+/**
+ * Class Visibility
+ * In Shopware6 the product visibility is inherited by the variants
+ *
+ * @package Boxalino\IntelligenceFramework\Service\Exporter\Item
+ */
 class Visibility extends ItemsAbstract
 {
 
@@ -25,10 +31,14 @@ class Visibility extends ItemsAbstract
     {
         $query = $this->connection->createQueryBuilder();
         $query->select($this->getRequiredFields())
-            ->from("product_visibility")
+            ->from("product")
+            ->leftJoin("product", 'product_visibility', 'product_visibility_parent',
+                'product.parent_id = product_visibility_parent.product_id AND product.parent_version_id = product_visibility_parent.product_version_id')
+            ->leftJoin("product", 'product_visibility', 'product_visibility',
+                'product.id = product_visibility.product_id AND product.version_id = product_visibility.product_version_id')
             ->andWhere('product_visibility.product_version_id = :live')
             ->andWhere('product_visibility.sales_channel_id = :channel')
-            ->addGroupBy('product_visibility.product_id')
+            ->addGroupBy('product.id')
             ->setParameter("channel", Uuid::fromHexToBytes($this->getChannelId()), ParameterType::BINARY)
             ->setParameter('live', Uuid::fromHexToBytes(Defaults::LIVE_VERSION), ParameterType::BINARY)
             ->setFirstResult(($page - 1) * Product::EXPORTER_STEP)
@@ -45,7 +55,9 @@ class Visibility extends ItemsAbstract
 
     public function getRequiredFields(): array
     {
-        return ["visibility as {$this->getPropertyIdField()}", 'LOWER(HEX(product_id)) AS product_id'];
+        return ['LOWER(HEX(product.id)) AS product_id',
+            "IF(product.parent_id IS NULL, product_visibility.visibility, product_visibility_parent.visibility) AS {$this->getPropertyIdField()}"
+        ];
     }
 
 }

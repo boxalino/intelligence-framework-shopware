@@ -14,26 +14,21 @@ use Shopware\Core\Framework\Uuid\Uuid;
  *
  * @package Boxalino\IntelligenceFramework\Service\Exporter\Item
  */
-class Property extends ItemsAbstract
+class Property extends PropertyTranslation
 {
     /**
      * @var string
      */
     protected $property;
 
-    /**
-     * @var string
-     */
-    protected $propertyId;
-
 
     public function export()
     {
-        $this->logger->info("BxIndexLog: Preparing products - START FACETS EXPORT.");
+        $this->logger->info("BxIndexLog: Preparing products - START PROPERTIES EXPORT.");
         $properties = $this->getPropertyNames();
         foreach($properties as $property)
         {
-            $this->property = $property['name']; $this->propertyId = $property['property_group_id'];
+            $this->property = $property['name']; $this->setPropertyId($property['property_group_id']);
             $this->logger->info("BxIndexLog: Preparing products - START $this->property EXPORT.");
             $totalCount = 0; $page = 1; $data=[]; $header = true;
             while (Product::EXPORTER_LIMIT > $totalCount + Product::EXPORTER_STEP)
@@ -68,7 +63,7 @@ class Property extends ItemsAbstract
             $this->logger->info("BxIndexLog: Preparing products - END $this->property.");
         }
 
-        $this->logger->info("BxIndexLog: Preparing products - END FACES.");
+        $this->logger->info("BxIndexLog: Preparing products - END PROPERTIES.");
     }
 
     /**
@@ -105,59 +100,6 @@ class Property extends ItemsAbstract
     }
 
     /**
-     * Accessing store-view level translation for each facet option
-     *
-     * @param int $page
-     * @return QueryBuilder
-     * @throws \Shopware\Core\Framework\Uuid\Exception\InvalidUuidException
-     */
-    protected function getLocalizedPropertyQuery(int $page = 1) : QueryBuilder
-    {
-        $query = $this->connection->createQueryBuilder();
-        $query->select($this->getRequiredFields())
-            ->from("property_group_option")
-            ->leftJoin('property_group_option', '( ' . $this->getLocalizedFieldsQuery()->__toString() . ') ',
-                'translation', 'translation.property_group_option_id = property_group_option.id')
-            ->andWhere('property_group_option.property_group_id = :propertyGroupId')
-            ->andWhere($this->getLanguageHeaderConditional())
-            ->addGroupBy('property_group_option.id')
-            ->setParameter('propertyGroupId', Uuid::fromHexToBytes($this->propertyId), ParameterType::BINARY)
-            ->setFirstResult(($page - 1) * Product::EXPORTER_STEP)
-            ->setMaxResults(Product::EXPORTER_STEP);
-
-        return $query;
-    }
-
-    /**
-     * @param string $property
-     * @return \Doctrine\DBAL\Query\QueryBuilder
-     * @throws \Exception
-     */
-    protected function getLocalizedFieldsQuery() : QueryBuilder
-    {
-        return $this->getLocalizedFields('property_group_option_translation',
-            'property_group_option_id', 'property_group_option_id',
-            'property_group_option_id', "name",
-            ['property_group_option_translation.property_group_option_id']
-        );
-    }
-
-    /**
-     * @return string
-     * @throws \Exception
-     */
-    protected function getLanguageHeaderConditional() : string
-    {
-        $conditional = [];
-        foreach ($this->getLanguageHeaderColumns() as $column)
-        {
-            $conditional[]= "$column IS NOT NULL ";
-        }
-
-        return implode(" OR " , $conditional);
-    }
-
-    /**
      * All translation fields from the product_group_option* table
      *
      * @return array
@@ -168,24 +110,6 @@ class Property extends ItemsAbstract
         return array_merge($this->getLanguageHeaderColumns(),
             ["LOWER(HEX(property_group_option.id)) AS {$this->getPropertyIdField()}"]
         );
-    }
-
-    /**
-     * @return array
-     * @throws \Exception
-     */
-    public function getMainHeaderColumns() : array
-    {
-        return [array_merge($this->getLanguageHeaders(), [$this->getPropertyIdField()])];
-    }
-
-    /**
-     * @return array
-     * @throws \Exception
-     */
-    public function getLanguageHeaderColumns() : array
-    {
-        return preg_filter('/^/', 'translation.', $this->getLanguageHeaders());
     }
 
     /**
@@ -209,23 +133,7 @@ class Property extends ItemsAbstract
      */
     public function getItemRelationFile() : string
     {
-        return "products_$this->property.csv";
-    }
-
-    /**
-     * Get existing facets names&codes
-     *
-     * @return false|mixed
-     */
-    public function getPropertyNames() : array
-    {
-        $query = $this->connection->createQueryBuilder()
-            ->select(["LOWER(HEX(property_group_id)) AS property_group_id", "name"])
-            ->from("property_group_translation")
-            ->where("language_id = :languageId")
-            ->setParameter("languageId", Uuid::fromHexToBytes($this->getChannelDefaultLanguage()), ParameterType::STRING);
-
-        return $query->execute()->fetchAll(FetchMode::ASSOCIATIVE);
+        return "property_$this->property.csv";
     }
 
 }
