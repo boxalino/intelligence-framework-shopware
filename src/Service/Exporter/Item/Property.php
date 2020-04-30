@@ -8,11 +8,13 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Shopware\Core\Framework\Uuid\Uuid;
 
 /**
- * Class Facet
+ * Class Property
  * check src/Core/Content/Property/PropertyGroupDefinition.php for other property types and definitions
+ * Exports all product-property relations which assign filterable information such as size or color to the product
+ *
  * @package Boxalino\IntelligenceFramework\Service\Exporter\Item
  */
-class Facet extends ItemsAbstract
+class Property extends ItemsAbstract
 {
     /**
      * @var string
@@ -33,16 +35,33 @@ class Facet extends ItemsAbstract
         {
             $this->property = $property['name']; $this->propertyId = $property['property_group_id'];
             $this->logger->info("BxIndexLog: Preparing products - START $this->property EXPORT.");
-            $query = $this->getLocalizedPropertyQuery();
-            $count = $query->execute()->rowCount();
-            if ($count == 0) {
-                $this->logger->info("BxIndexLog: PRODUCTS EXPORT: No options found for $this->property.");
-                $headers = $this->getMainHeaderColumns();
-                $this->getFiles()->savePartToCsv($this->getItemMainFile(), $headers);
-            } else {
+            $totalCount = 0; $page = 1; $data=[]; $header = true;
+            while (Product::EXPORTER_LIMIT > $totalCount + Product::EXPORTER_STEP)
+            {
+                $query = $this->getLocalizedPropertyQuery($page);
+                $count = $query->execute()->rowCount();
+                $totalCount += $count;
+                if ($totalCount == 0) {
+                    if ($page == 1) {
+                        $this->logger->info("BxIndexLog: PRODUCTS EXPORT FACETS: No options found for $this->property.");
+                        $headers = $this->getMainHeaderColumns();
+                        $this->getFiles()->savePartToCsv($this->getItemMainFile(), $headers);
+                    }
+                    break;
+                }
                 $data = $query->execute()->fetchAll();
-                $data = array_merge(array(array_keys(end($data))), $data);
-                $this->getFiles()->savePartToCsv($this->getItemMainFile(), $data);
+                if ($header) {
+                    $header = false;
+                    $data = array_merge(array(array_keys(end($data))), $data);
+                }
+
+                foreach(array_chunk($data, Product::EXPORTER_DATA_SAVE_STEP) as $dataSegment)
+                {
+                    $this->getFiles()->savePartToCsv($this->getItemMainFile(), $dataSegment);
+                }
+
+                $data = []; $page++;
+                if($totalCount < Product::EXPORTER_STEP - 1) { break;}
             }
 
             $this->exportItemRelation();
@@ -72,11 +91,11 @@ class Facet extends ItemsAbstract
     {
         $query = $this->connection->createQueryBuilder();
         $query->select([
-            "LOWER(HEX(product_option.product_id)) AS product_id",
-            "LOWER(HEX(product_option.property_group_option_id)) AS {$this->getPropertyIdField()}"])
-            ->from("product_option")
-            ->leftJoin("product_option", "property_group_option", "property_group_option",
-                "product_option.property_group_option_id = property_group_option.id")
+            "LOWER(HEX(product_property.product_id)) AS product_id",
+            "LOWER(HEX(product_property.property_group_option_id)) AS {$this->getPropertyIdField()}"])
+            ->from("product_property")
+            ->leftJoin("product_property", "property_group_option", "property_group_option",
+                "product_property.property_group_option_id = property_group_option.id")
             ->where("property_group_option.property_group_id = :propertyId")
             ->setParameter("propertyId", Uuid::fromHexToBytes($this->propertyId), ParameterType::STRING)
             ->setFirstResult(($page - 1) * Product::EXPORTER_STEP)
@@ -88,10 +107,11 @@ class Facet extends ItemsAbstract
     /**
      * Accessing store-view level translation for each facet option
      *
+     * @param int $page
      * @return QueryBuilder
      * @throws \Shopware\Core\Framework\Uuid\Exception\InvalidUuidException
      */
-    protected function getLocalizedPropertyQuery() : QueryBuilder
+    protected function getLocalizedPropertyQuery(int $page = 1) : QueryBuilder
     {
         $query = $this->connection->createQueryBuilder();
         $query->select($this->getRequiredFields())
@@ -101,7 +121,9 @@ class Facet extends ItemsAbstract
             ->andWhere('property_group_option.property_group_id = :propertyGroupId')
             ->andWhere($this->getLanguageHeaderConditional())
             ->addGroupBy('property_group_option.id')
-            ->setParameter('propertyGroupId', Uuid::fromHexToBytes($this->propertyId), ParameterType::BINARY);
+            ->setParameter('propertyGroupId', Uuid::fromHexToBytes($this->propertyId), ParameterType::BINARY)
+            ->setFirstResult(($page - 1) * Product::EXPORTER_STEP)
+            ->setMaxResults(Product::EXPORTER_STEP);
 
         return $query;
     }

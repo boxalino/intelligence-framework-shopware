@@ -53,10 +53,11 @@
 
         <service id="boxalino.exporter.component.product" class="Boxalino\IntelligenceFramework\Service\Exporter\Component\Product" parent="boxalino.exporter.component" >
             <argument type="service" id="boxalino.exporter.component.product.category"/>
-            <argument type="service" id="boxalino.exporter.component.product.facet"/>
+            <argument type="service" id="boxalino.exporter.component.product.property"/>
             <argument type="service" id="boxalino.exporter.component.product.media"/>
             <argument type="service" id="boxalino.exporter.component.product.manufacturer"/>
             <argument type="service" id="boxalino.exporter.component.product.price"/>
+            <argument type="service" id="boxalino.exporter.component.product.advancedPrice"/>
             <argument type="service" id="boxalino.exporter.component.product.url"/>
             <argument type="service" id="boxalino.exporter.component.product.review"/>
             <argument type="service" id="boxalino.exporter.component.product.translation"/>
@@ -65,7 +66,7 @@
         </service>
 
         <service id="boxalino.exporter.component.product.category" class="Boxalino\IntelligenceFramework\Service\Exporter\Item\Category" parent="boxalino.exporter.component.item" />
-        <service id="boxalino.exporter.component.product.facet" class="Boxalino\IntelligenceFramework\Service\Exporter\Item\Facet" parent="boxalino.exporter.component.item" />
+        <service id="boxalino.exporter.component.product.property" class="Boxalino\IntelligenceFramework\Service\Exporter\Item\Property" parent="boxalino.exporter.component.item" />
         <service id="boxalino.exporter.component.product.manufacturer" class="Boxalino\IntelligenceFramework\Service\Exporter\Item\Manufacturer" parent="boxalino.exporter.component.item" />
         <service id="boxalino.exporter.component.product.review" class="Boxalino\IntelligenceFramework\Service\Exporter\Item\Review" parent="boxalino.exporter.component.item" />
         <service id="boxalino.exporter.component.product.tag" class="Boxalino\IntelligenceFramework\Service\Exporter\Item\Tag" parent="boxalino.exporter.component.item" />
@@ -79,7 +80,10 @@
         </service>
 
         <service id="boxalino.exporter.component.product.price" class="Boxalino\IntelligenceFramework\Service\Exporter\Item\Price" parent="boxalino.exporter.component.item">
-            <argument type="service" id="Shopware\Core\Checkout\Cart\Rule\CartAmountRule"/>
+            <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextService"/>
+        </service>
+
+        <service id="boxalino.exporter.component.product.advancedPrice" class="Boxalino\IntelligenceFramework\Service\Exporter\Item\PriceAdvanced" parent="boxalino.exporter.component.item">
             <argument type="service" id="Shopware\Core\System\SalesChannel\Context\SalesChannelContextService"/>
         </service>
 

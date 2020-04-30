@@ -2,11 +2,13 @@
 namespace Boxalino\IntelligenceFramework\Service\Exporter\Component;
 
 use Boxalino\IntelligenceFramework\Service\Exporter\ExporterScheduler;
+use Boxalino\IntelligenceFramework\Service\Exporter\Item\ItemsAbstract;
 use Boxalino\IntelligenceFramework\Service\Exporter\Item\Manufacturer;
 use Boxalino\IntelligenceFramework\Service\Exporter\Item\Category;
-use Boxalino\IntelligenceFramework\Service\Exporter\Item\Facet;
 use Boxalino\IntelligenceFramework\Service\Exporter\Item\Media;
 use Boxalino\IntelligenceFramework\Service\Exporter\Item\Price;
+use Boxalino\IntelligenceFramework\Service\Exporter\Item\PriceAdvanced;
+use Boxalino\IntelligenceFramework\Service\Exporter\Item\Property;
 use Boxalino\IntelligenceFramework\Service\Exporter\Item\Translation;
 use Boxalino\IntelligenceFramework\Service\Exporter\Item\Url;
 use Boxalino\IntelligenceFramework\Service\Exporter\Item\Review;
@@ -16,6 +18,7 @@ use Boxalino\IntelligenceFramework\Service\Exporter\Item\Tag;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Google\Auth\Cache\Item;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Uuid\Uuid;
@@ -47,7 +50,7 @@ class Product extends ExporterComponentAbstract
     protected $categoryExporter;
 
     /**
-     * @var Facet
+     * @var Property
      */
     protected $facetExporter;
 
@@ -65,6 +68,11 @@ class Product extends ExporterComponentAbstract
      * @var Price
      */
     protected $priceExporter;
+
+    /**
+     * @var PriceAdvanced
+     */
+    protected $priceAdvancedExporter;
 
     /**
      * @var Url
@@ -91,22 +99,30 @@ class Product extends ExporterComponentAbstract
      */
     protected $visibilityExporter;
 
+    /**
+     * @var \ArrayObject
+     */
+    protected $itemExportersList;
+
     public function __construct(
         ComponentResource $resource,
         Connection $connection,
         LoggerInterface $boxalinoLogger,
         Configuration $exporterConfigurator,
         Category $categoryExporter,
-        Facet $facetExporter,
+        Property $facetExporter,
         Media $imagesExporter,
         Manufacturer $manufacturerExporter,
         Price $priceExporter,
+        PriceAdvanced $priceAdvanced,
         Url $urlExporter,
         Review $reviewsExporter,
         Translation $translationExporter,
         Tag $tagExporter,
         Visibility $visibilityExporter
     ){
+        $this->itemExportersList = new \ArrayObject();
+        $this->priceAdvancedExporter = $priceAdvanced;
         $this->categoryExporter = $categoryExporter;
         $this->facetExporter = $facetExporter;
         $this->imagesExporter = $imagesExporter;
@@ -136,6 +152,8 @@ class Product extends ExporterComponentAbstract
             $query = $this->connection->createQueryBuilder();
             $query->select($properties)
                 ->from('product', 'p')
+                ->leftJoin("p", 'product', 'parent',
+                    'p.parent_id = parent.id AND p.parent_version_id = parent.version_id')
                 ->leftJoin('p', 'tax', 'tax', 'tax.id = p.tax_id')
                 ->leftJoin('p', 'delivery_time_translation', 'delivery_time_translation',
                     'p.delivery_time_id = delivery_time_translation.delivery_time_id AND delivery_time_translation.language_id = :defaultLanguage')
@@ -143,9 +161,8 @@ class Product extends ExporterComponentAbstract
                 ->leftJoin('p', 'currency', 'currency', "JSON_UNQUOTE(JSON_EXTRACT(p.price->>'$.*.currencyId', '$[0]')) = LOWER(HEX(currency.id))")
                 ->andWhere('p.version_id = :live')
                 ->andWhere("JSON_SEARCH(p.category_tree, 'one', :channelRootCategoryId) IS NOT NULL")
-                ->andWhere('p.price IS NOT NULL') #REMOVE PRODUCTS WHICH HAVE NO PRICE SET
                 ->addGroupBy('p.id')
-                ->orderBy('p.id', 'DESC')
+                ->orderBy('p.created_at', 'DESC')
                 ->setParameter('live', Uuid::fromHexToBytes(Defaults::LIVE_VERSION), ParameterType::BINARY)
                 ->setParameter('channelRootCategoryId', $rootCategoryId, ParameterType::STRING)
                 ->setParameter('defaultLanguage', Uuid::fromHexToBytes($defaultLanguageId), ParameterType::BINARY)
@@ -172,11 +189,9 @@ class Product extends ExporterComponentAbstract
                 $this->exportedProductIds[] = $row['id'];
                 $row['purchasable'] = $this->getProductPurchasableValue($row);
                 $row['immediate_delivery'] = $this->getProductImmediateDeliveryValue($row);
-                $row['group_id'] = $this->getProductGroupValue($row);
-                if($header) {
-                    $exportFields = array_keys($row);
-                    $data[] = $exportFields;
-                    $header = false;
+                if($header)
+                {
+                    $exportFields = array_keys($row); $data[] = $exportFields; $header = false;
                 }
                 $data[] = $row;
                 if(count($data) > self::EXPORTER_DATA_SAVE_STEP)
@@ -227,6 +242,7 @@ class Product extends ExporterComponentAbstract
         $this->_exportExtra("manufacturers", $this->manufacturerExporter);
         $this->_exportExtra("facets", $this->facetExporter);
         $this->_exportExtra("prices", $this->priceExporter);
+        $this->_exportExtra("advancedPrices", $this->priceAdvancedExporter);
         $this->_exportExtra("reviews", $this->reviewsExporter);
         $this->_exportExtra("tags", $this->tagExporter);
         $this->_exportExtra("visibility", $this->visibilityExporter);
@@ -240,8 +256,13 @@ class Product extends ExporterComponentAbstract
         {
             $this->_exportExtra("urls", $this->urlExporter);
         }
-    }
 
+        /** @var ItemsAbstract $itemExporter */
+        foreach($this->itemExportersList as $itemExporter)
+        {
+            $this->_exportExtra($itemExporter->getPropertyName(), $itemExporter);
+        }
+    }
 
     /**
      * Contains the logic for exporting individual items describing the product component
@@ -323,25 +344,33 @@ class Product extends ExporterComponentAbstract
     }
 
     /**
+     * In order to ensure transparency for the CDAP integration
+     *
      * @return array
      */
     public function getRequiredProperties(): array
     {
         return [
             'LOWER(HEX(p.id)) AS id', 'p.auto_increment', 'p.product_number', 'p.active', 'LOWER(HEX(p.parent_id)) AS parent_id',
-            'LOWER(HEX(p.tax_id)) AS tax_id', 'LOWER(HEX(p.product_manufacturer_id)) AS product_manufacturer_id',
+            'IF(p.parent_id IS NULL, p.active, parent.active) AS bx_parent_active',
+            'LOWER(HEX(p.tax_id)) AS tax_id',
             'LOWER(HEX(p.delivery_time_id)) AS delivery_time_id', 'LOWER(HEX(p.product_media_id)) AS product_media_id',
             'LOWER(HEX(p.cover)) AS cover', 'LOWER(HEX(p.unit_id)) AS unit_id', 'p.category_tree', 'p.option_ids',
             'p.property_ids', 'p.manufacturer_number', 'p.ean',
-            'p.stock', 'p.available_stock', 'p.available', 'p.restock_time', 'p.is_closeout', 'p.purchase_steps',
-            'p.max_purchase', 'p.min_purchase', 'p.purchase_unit', 'p.reference_unit', 'p.shipping_free', 'p.purchase_price',
-            'p.mark_as_topseller', 'p.weight', 'p.height', 'p.length', 'p.release_date', 'p.whitelist_ids', 'p.blacklist_ids',
-            'p.variant_restrictions', 'p.configurator_group_config', 'p.created_at', 'p.updated_at',
-            'p.rating_average', 'p.display_group', 'p.child_count',
-            'JSON_EXTRACT(p.price->>\'$.*.gross\', \'$[0]\') AS price_gross', 'JSON_EXTRACT(p.price->>\'$.*.net\', \'$[0]\') AS price_gross',
+            'p.stock', 'p.available_stock', 'IF(p.parent_id IS NULL, p.available, parent.available) AS available',
+            'IF(p.parent_id IS NULL, p.restock_time, parent.restock_time) AS restock_time',
+            'IF(p.parent_id IS NULL, p.is_closeout, parent.is_closeout) AS is_closeout', 'p.purchase_steps',
+            'p.max_purchase', 'p.min_purchase', 'p.purchase_unit', 'p.reference_unit',
+            'IF(p.parent_id IS NULL, p.shipping_free, parent.shipping_free) AS shipping_free',
+            'IF(p.parent_id IS NULL, p.purchase_price, parent.purchase_price) AS purchase_price',
+            'IF(p.parent_id IS NULL, p.mark_as_topseller, parent.mark_as_topseller) AS mark_as_topseller',
+            'p.weight', 'p.height', 'p.length', 'IF(p.parent_id IS NULL, p.release_date, parent.release_date) AS release_date',
+            'p.whitelist_ids', 'p.blacklist_ids', 'p.configurator_group_config', 'p.created_at', 'p.updated_at',
+            'IF(p.parent_id IS NULL, p.rating_average, parent.rating_average) AS rating_average', 'p.display_group', 'p.child_count',
             'currency.iso_code AS currency', 'currency.factor AS currency_factor',
             'tax.tax_rate', 'delivery_time_translation.name AS delivery_time_name',
-            'unit_translation.name AS unit_name', 'unit_translation.short_code AS unit_short_code'
+            'unit_translation.name AS unit_name', 'unit_translation.short_code AS unit_short_code',
+            'IF(p.parent_id IS NULL, LOWER(HEX(p.id)), LOWER(HEX(parent.parent_id))) AS group_id'
         ];
     }
 
@@ -419,6 +448,12 @@ class Product extends ExporterComponentAbstract
         }
 
         return $row['parent_id'];
+    }
+
+    public function addItemExporter(ItemsAbstract $extraExporter)
+    {
+        $this->itemExportersList->append($extraExporter);
+        return $this;
     }
 
 }

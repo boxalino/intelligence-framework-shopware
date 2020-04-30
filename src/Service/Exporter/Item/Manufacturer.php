@@ -52,6 +52,8 @@ class Manufacturer extends ItemsAbstract
         $query = $this->connection->createQueryBuilder();
         $query->select($this->getRequiredFields())
             ->from('product', 'p')
+            ->leftJoin("p", 'product', 'parent',
+                'p.parent_id = parent.id AND p.parent_version_id = parent.version_id')
             ->andWhere('p.version_id = :live')
             ->andWhere('p.product_manufacturer_version_id = :live')
             ->andWhere("JSON_SEARCH(p.category_tree, 'one', :channelRootCategoryId) IS NOT NULL")
@@ -92,6 +94,8 @@ class Manufacturer extends ItemsAbstract
      */
     public function getRequiredFields(): array
     {
-        return ['LOWER(HEX(p.id)) AS product_id', "LOWER(HEX(p.product_manufacturer_id)) AS {$this->getPropertyIdField()}"];
+        return ['LOWER(HEX(p.id)) AS product_id',
+            "IF(p.product_manufacturer_id IS NULL, LOWER(HEX(parent.product_manufacturer_id)), LOWER(HEX(p.product_manufacturer_id))) AS {$this->getPropertyIdField()}"
+        ];
     }
 }
