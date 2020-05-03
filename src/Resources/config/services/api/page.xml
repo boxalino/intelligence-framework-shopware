@@ -32,7 +32,7 @@
         </service>
 
         <!-- Shopware6 - Boxalino sorting handler -->
-        <service id="Boxalino\IntelligenceFramework\Framework\Content\Listing\ApiListingSortingAccessor">
+        <service id="Boxalino\IntelligenceFramework\Framework\Content\Listing\ApiListingSortingAccessor" public="true">
             <argument type="service" id="Shopware\Core\Content\Product\SalesChannel\Listing\ProductListingSortingRegistry"/>
             <call method="add">
                 <argument type="collection">
