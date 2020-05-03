@@ -5,7 +5,6 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Shopware\Core\Checkout\Cart\Rule\CartAmountRule;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Framework\Rule\Rule;
-use Shopware\Core\Profiling\Checkout\SalesChannelContextServiceProfiler;
 use Boxalino\IntelligenceFramework\Service\Exporter\Component\Product;
 use Boxalino\IntelligenceFramework\Service\Exporter\Util\Configuration;
 use Doctrine\DBAL\Connection;
@@ -44,8 +43,7 @@ class PriceAdvanced extends ItemsAbstract
         Connection $connection,
         LoggerInterface $boxalinoLogger,
         Configuration $exporterConfigurator,
-        #SalesChannelContextService $salesChannelContextService
-        SalesChannelContextServiceProfiler $salesChannelContextService
+        SalesChannelContextService $salesChannelContextService
     ){
         $this->rules = new \ArrayObject();
         $this->salesChannelContextService = $salesChannelContextService;
