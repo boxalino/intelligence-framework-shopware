@@ -55,7 +55,7 @@ class ApiCrossSellingLoaderSubscriber implements EventSubscriberInterface
         $request->attributes->set("mainProductId", $page->getProduct()->getId());
 
         $result = $this->apiCrossSellingLoader->load($request, $event->getSalesChannelContext(), $page->getCrossSellings());
-        $event->getPage()->setCrossSellings($result);
+        $page->setCrossSellings($result);
     }
 
 }

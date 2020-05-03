@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 namespace Boxalino\IntelligenceFramework\Framework\Request;
 
+use Boxalino\IntelligenceFramework\Framework\Content\Listing\ApiListingSortingAccessor;
 use Boxalino\IntelligenceFramework\Framework\SalesChannelContextTrait;
 use Boxalino\IntelligenceFramework\Service\Api\ApiCookieSubscriber;
 use Boxalino\IntelligenceFramework\Service\Api\Request\ParameterFactory;
@@ -56,6 +57,11 @@ class RequestTransformer implements RequestTransformerInterface
     protected $parameterFactory;
 
     /**
+     * @var ApiListingSortingAccessor
+     */
+    protected $productListingSortingRegistry;
+
+    /**
      * @var int
      */
     protected $limit = 0;
@@ -71,8 +77,10 @@ class RequestTransformer implements RequestTransformerInterface
         Connection $connection,
         ParameterFactory $parameterFactory,
         Configuration $configuration,
+        ApiListingSortingAccessor $productListingSortingRegistry,
         LoggerInterface $logger
     ) {
+        $this->productListingSortingRegistry = $productListingSortingRegistry;
         $this->connection = $connection;
         $this->configuration = $configuration;
         $this->parameterFactory = $parameterFactory;
@@ -115,8 +123,8 @@ class RequestTransformer implements RequestTransformerInterface
             ->setCustomerId($this->getCustomerId($request))
             ->setLanguage(substr($request->getLocale(), 0, 2));
 
-        $this->addHitCount();
-        $this->addOffset(1);
+        $this->addHitCount($request);
+        $this->addOffset($request);
         $this->addParameters($request);
 
         return $this->requestDefinition;
@@ -202,21 +210,14 @@ class RequestTransformer implements RequestTransformerInterface
         parse_str($queryString, $params);
         foreach($params as $param => $value)
         {
+            if(in_array($param, ['p', 'limit']))
+            {
+                continue;
+            }
+
             if($param == "sort")
             {
-                $this->addSort($value);
-                continue;
-            }
-
-            if($param == 'p')
-            {
-                $this->addOffset((int)$value);
-                continue;
-            }
-
-            if($param == 'limit')
-            {
-                $this->addHitCount($value);
+                $this->addSorting($request);
                 continue;
             }
 
@@ -234,75 +235,26 @@ class RequestTransformer implements RequestTransformerInterface
     }
 
     /**
-     * @param string $value
-     */
-    public function addSort(string $value)
-    {
-        $hasDirection = strstr($value, "-");
-        $direction = '';
-        if($hasDirection)
-        {
-            $direction =  mb_substr(strstr($value, "-"), 1, 4);
-        }
-        $field = strstr($value, "-", true);
-        if($field === 'score')
-        {
-            return ;
-        }
-        $reverse = $direction === FieldSorting::DESCENDING ?? false;
-
-        $this->requestDefinition->addSort(
-            $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_SORT)
-                ->add($this->getFieldName($field), $reverse)
-        );
-    }
-
-    /**
-     * @param $field
-     * @return $this|string
-     */
-    public function getFieldName($field)
-    {
-        if(in_array($field, array_keys($this->getSortFields())))
-        {
-            return $this->getSortFields()[$field];
-        }
-
-        return "products_" . $field;
-    }
-
-    /**
      * @param int $page
      * @return int
      */
-    public function addOffset(int $page = 1) : RequestTransformer
+    public function addOffset(Request $request) : RequestTransformer
     {
-        $this->requestDefinition->setOffset(($page-1) * $this->getLimit());
+        $page = $this->getPage($request);
+        $this->requestDefinition->setOffset(($page-1) * $this->getLimit($request));
         return $this;
     }
 
     /**
-     * As set in platform/src/Core/Content/Product/SalesChannel/Listing/ProductListingFeaturesSubscriber.php
+     * Hitcount is a concept similar to limit
      *
-     * @return int
-     */
-    public function getLimit() : int
-    {
-        return 24;
-    }
-
-    /**
      * @param int $hits
+     * @param Request $request
      * @return $this
      */
-    public function addHitCount(int $hits = 0) : RequestTransformer
+    public function addHitCount(Request $request) : RequestTransformer
     {
-        if(!$hits)
-        {
-            $hits = $this->getLimit();
-        }
-
-        $this->requestDefinition->setHitCount($hits);
+        $this->requestDefinition->setHitCount($this->getLimit($request));
         return $this;
     }
 
@@ -325,15 +277,54 @@ class RequestTransformer implements RequestTransformerInterface
     }
 
     /**
-     * @return array
+     * As set in platform/src/Core/Content/Product/SalesChannel/Listing/ProductListingFeaturesSubscriber.php
+     * @return string | null
      */
-    public function getSortFields() : array
+    protected function addSorting(Request $request)
     {
-        return [
-            'name'      => 'products_bx_parent_title',
-            'price'     => 'products_bx_grouped_price',
-            'id       ' => 'products_group_id'
-        ];
+        $key = $request->get('sort', ApiListingSortingAccessor::BOXALINO_DEFAULT_SORT_FIELD);
+        if (!$key || $key === ApiListingSortingAccessor::BOXALINO_DEFAULT_SORT_FIELD) {
+            return;
+        }
+
+        $sorting = $this->productListingSortingRegistry->requestTransform($key);
+        foreach($sorting as $sort)
+        {
+            $this->requestDefinition->addSort(
+                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_SORT)
+                    ->add($sort["field"], $sort["reverse"])
+            );
+        }
+    }
+
+    /**
+     * As set in platform/src/Core/Content/Product/SalesChannel/Listing/ProductListingFeaturesSubscriber.php
+     * @return int
+     */
+    protected function getLimit(Request $request): int
+    {
+        $limit = $request->query->getInt('limit', 24);
+
+        if ($request->isMethod(Request::METHOD_POST)) {
+            $limit = $request->request->getInt('limit', $limit);
+        }
+
+        return $limit <= 0 ? 24 : $limit;
+    }
+
+    /**
+     * As set in platform/src/Core/Content/Product/SalesChannel/Listing/ProductListingFeaturesSubscriber.php
+     * @return int
+     */
+    protected function getPage(Request $request): int
+    {
+        $page = $request->query->getInt('p', 1);
+
+        if ($request->isMethod(Request::METHOD_POST)) {
+            $page = $request->request->getInt('p', $page);
+        }
+
+        return $page <= 0 ? 1 : $page;
     }
 
 }

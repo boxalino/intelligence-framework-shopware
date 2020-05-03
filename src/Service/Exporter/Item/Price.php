@@ -61,9 +61,9 @@ class Price extends ItemsAbstract
     {
         $attributeSourceKey = $this->getLibrary()->addCSVItemFile($this->getFiles()->getPath($this->getItemRelationFile()), 'product_id');
         $this->getLibrary()->addSourceDiscountedPriceField($attributeSourceKey, 'price');
-
         $this->getLibrary()->addSourceListPriceField($attributeSourceKey, 'list_price');
-        $this->getLibrary()->addFieldParameter($attributeSourceKey,'bx_listprice', 'pc_fields', 'CASE WHEN (price.price IS NULL OR price.price <= 0) AND price.list_price IS NOT NULL then price.list_price ELSE price.price END as price_value');
+
+        $this->getLibrary()->addFieldParameter($attributeSourceKey,'bx_listprice', 'pc_fields', 'CASE WHEN (price.list_price IS NULL OR price.list_price <= 0) AND price.price IS NOT NULL then price.price ELSE price.list_price END as price_value');
         $this->getLibrary()->addFieldParameter($attributeSourceKey,'bx_listprice', 'pc_tables', 'LEFT JOIN `%%EXTRACT_PROCESS_TABLE_BASE%%_products_product_price` as price ON t.product_id = price.product_id');
 
         $this->getLibrary()->addSourceNumberField($attributeSourceKey, 'bx_grouped_price', 'price');
@@ -75,12 +75,12 @@ class Price extends ItemsAbstract
 
         $this->getLibrary()->addSourceNumberField($attributeSourceKey, 'list_price_net', 'list_price_net');
         $this->getLibrary()->addFieldParameter($attributeSourceKey, 'list_price_net', 'multiValued', 'false');
-        $this->getLibrary()->addFieldParameter($attributeSourceKey,'list_price_net', 'pc_fields', 'CASE WHEN (price.price_net IS NULL OR price.price_net <= 0) AND price.list_price_net IS NOT NULL then price.list_price_net ELSE price.price_net END as price_value');
+        $this->getLibrary()->addFieldParameter($attributeSourceKey,'list_price_net', 'pc_fields', 'CASE WHEN (price.list_price_net IS NULL OR price.list_price_net <= 0) AND price.price_net IS NOT NULL then price.price_net ELSE price.list_price_net END as price_value');
         $this->getLibrary()->addFieldParameter($attributeSourceKey,'list_price_net', 'pc_tables', 'LEFT JOIN `%%EXTRACT_PROCESS_TABLE_BASE%%_products_product_price` as price ON t.product_id = price.product_id');
 
         $this->getLibrary()->addSourceNumberField($attributeSourceKey, 'list_price_gross', 'list_price_gross');
         $this->getLibrary()->addFieldParameter($attributeSourceKey, 'list_price_gross', 'multiValued', 'false');
-        $this->getLibrary()->addFieldParameter($attributeSourceKey,'list_price_gross', 'pc_fields', 'CASE WHEN (price.price_gross IS NULL OR price.price_gross <= 0) AND price.list_price_gross IS NOT NULL then price.list_price_gross ELSE price.price_gross END as price_value');
+        $this->getLibrary()->addFieldParameter($attributeSourceKey,'list_price_gross', 'pc_fields', 'CASE WHEN (price.list_price_gross IS NULL OR price.list_price_gross <= 0) AND price.price_gross IS NOT NULL then price.price_gross ELSE price.list_price_gross END as price_value');
         $this->getLibrary()->addFieldParameter($attributeSourceKey,'list_price_gross', 'pc_tables', 'LEFT JOIN `%%EXTRACT_PROCESS_TABLE_BASE%%_products_product_price` as price ON t.product_id = price.product_id');
     }
 

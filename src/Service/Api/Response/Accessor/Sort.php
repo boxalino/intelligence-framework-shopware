@@ -12,14 +12,9 @@ class Sort extends Accessor
     implements AccessorInterface
 {
     /**
-     * @var array
-     */
-    protected $sortings = [];
-
-    /**
      * @var string
      */
-    protected $field = "score";
+    protected $field;
 
     /**
      * @var bool
@@ -63,23 +58,6 @@ class Sort extends Accessor
     {
         $this->reverse = $reverse;
         return $this;
-    }
-
-    /**
-     * @param $key
-     * @param $field
-     */
-    public function addSort($key, $field)
-    {
-        $this->sortings[$key] = $field;
-    }
-
-    /**
-     * @return array
-     */
-    public function getSortings() : array
-    {
-        return $this->sortings;
     }
 
 }

@@ -84,7 +84,7 @@ class CollectionDataProvider implements AccessorModelInterface
         $ids = array_map(function(AccessorInterface $block) use ($hitAccessor, $idField) {
             if(property_exists($block, $hitAccessor))
             {
-                return $block->get($hitAccessor)->get($idField);
+                return $block->get($hitAccessor)->get($idField)[0];
             }
         }, $blocks->getArrayCopy());
 

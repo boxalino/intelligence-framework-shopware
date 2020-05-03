@@ -65,7 +65,7 @@ abstract class ContextAbstract implements ShopwareApiContextInterface
     /**
      * @var string
      */
-    protected $groupBy = "id";
+    protected $groupBy = "products_group_id";
 
     /**
      * Listing constructor.

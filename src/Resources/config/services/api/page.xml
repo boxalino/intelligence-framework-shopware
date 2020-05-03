@@ -30,6 +30,19 @@
                  parent="Boxalino\IntelligenceFramework\Framework\Content\Page\ApiLoader" shared="false">
             <argument type="service" id="sales_channel.product.repository"/>
         </service>
+
+        <!-- Shopware6 - Boxalino sorting handler -->
+        <service id="Boxalino\IntelligenceFramework\Framework\Content\Listing\ApiListingSortingAccessor">
+            <argument type="service" id="Shopware\Core\Content\Product\SalesChannel\Listing\ProductListingSortingRegistry"/>
+            <call method="add">
+                <argument type="collection">
+                    <argument key="product.listingPrices">discountedPrice</argument>
+                    <argument key="product.name">products_title</argument>
+                    <argument key="product.id">products_group_id</argument>
+                    <argument key="_score">score</argument>
+                </argument>
+            </call>
+        </service>
     </services>
 
 </container>

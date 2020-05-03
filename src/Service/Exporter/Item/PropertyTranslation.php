@@ -94,9 +94,12 @@ abstract class PropertyTranslation extends ItemsAbstract
     public function getPropertyNames() : array
     {
         $query = $this->connection->createQueryBuilder()
-            ->select(["LOWER(HEX(property_group_id)) AS property_group_id", "name"])
-            ->from("property_group_translation")
-            ->where("language_id = :languageId")
+            ->select(["LOWER(HEX(property_group.id)) AS property_group_id", "IF(pgtl.name IS NULL, pgt.name, pgtl.name) AS name"])
+            ->from("property_group")
+            ->leftJoin("property_group", "property_group_translation", "pgt","property_group.id = pgt.property_group_id")
+            ->leftJoin("property_group", "property_group_translation", "pgtl",
+                "property_group.id = pgtl.property_group_id AND pgtl.language_id=:languageId")
+            ->groupBy("property_group.id")
             ->setParameter("languageId", Uuid::fromHexToBytes($this->getChannelDefaultLanguage()), ParameterType::STRING);
 
         return $query->execute()->fetchAll(FetchMode::ASSOCIATIVE);

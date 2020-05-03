@@ -329,7 +329,7 @@ class Product extends ExporterComponentAbstract
      */
     public function getNumberFields() : array
     {
-        return ["available_stock", "stock", "rating_average", "child_count"];
+        return ["available_stock", "stock", "rating_average", "child_count", "purchasable", "immediate_delivery8"];
     }
 
     /**
@@ -337,7 +337,7 @@ class Product extends ExporterComponentAbstract
      */
     public function getSingleValuedFields() : array
     {
-        return ["parent_id", "release_date", "created_at", "updated_at", "product_number", "manufacturer_number", "ean"];
+        return ["parent_id", "release_date", "created_at", "updated_at", "product_number", "manufacturer_number", "ean", "group_id", "mark_as_topseller"];
     }
 
     /**
@@ -365,21 +365,24 @@ class Product extends ExporterComponentAbstract
             'LOWER(HEX(p.tax_id)) AS tax_id',
             'LOWER(HEX(p.delivery_time_id)) AS delivery_time_id', 'LOWER(HEX(p.product_media_id)) AS product_media_id',
             'LOWER(HEX(p.cover)) AS cover', 'LOWER(HEX(p.unit_id)) AS unit_id', 'p.category_tree', 'p.option_ids',
-            'p.property_ids', 'p.manufacturer_number', 'p.ean',
-            'p.stock', 'p.available_stock', 'IF(p.parent_id IS NULL, p.available, parent.available) AS available',
-            'IF(p.parent_id IS NULL, p.restock_time, parent.restock_time) AS restock_time',
-            'IF(p.parent_id IS NULL, p.is_closeout, parent.is_closeout) AS is_closeout', 'p.purchase_steps',
-            'p.max_purchase', 'p.min_purchase', 'p.purchase_unit', 'p.reference_unit',
-            'IF(p.parent_id IS NULL, p.shipping_free, parent.shipping_free) AS shipping_free',
-            'IF(p.parent_id IS NULL, p.purchase_price, parent.purchase_price) AS purchase_price',
-            'IF(p.parent_id IS NULL, p.mark_as_topseller, parent.mark_as_topseller) AS mark_as_topseller',
-            'p.weight', 'p.height', 'p.length', 'IF(p.parent_id IS NULL, p.release_date, parent.release_date) AS release_date',
+            'p.property_ids',
+            'IF(p.parent_id IS NULL, p.manufacturer_number, IF(p.manufacturer_number IS NULL, parent.manufacturer_number, p.manufacturer_number)) AS manufactuere_number',
+            'IF(p.parent_id IS NULL, p.ean, IF(p.ean IS NULL, parent.ean, p.ean)) AS ean',
+            'p.stock', 'p.available_stock', 'p.available',
+            'IF(p.parent_id IS NULL, p.restock_time, IF(p.restock_time IS NULL, parent.restock_time, p.restock_time)) AS restock_time',
+            'IF(p.parent_id IS NULL, p.is_closeout, IF(p.is_closeout IS NULL, parent.is_closeout, p.is_closeout) AS is_closeout',
+            'p.purchase_steps', 'p.max_purchase', 'p.min_purchase', 'p.purchase_unit', 'p.reference_unit',
+            'IF(p.parent_id IS NULL, p.shipping_free, IF(p.shipping_free IS NULL, parent.shipping_free, p.shipping_free)) AS shipping_free',
+            'IF(p.parent_id IS NULL, p.purchase_price, IF(p.purchase_price IS NULL, parent.purchase_price, p.purchase_price)) AS purchase_price',
+            'IF(p.parent_id IS NULL, p.mark_as_topseller, IF(p.mark_as_topseller IS NULL, parent.mark_as_topseller, IF(p.available = 1, p.mark_as_topseller, parent.mark_as_topseller))) AS mark_as_topseller',
+            'p.weight', 'p.height', 'p.length',
+            'IF(p.parent_id IS NULL, p.release_date, IF(p.release_date IS NULL, parent.release_date, p.release_date)) AS release_date',
             'p.whitelist_ids', 'p.blacklist_ids', 'p.configurator_group_config', 'p.created_at', 'p.updated_at',
             'IF(p.parent_id IS NULL, p.rating_average, parent.rating_average) AS rating_average', 'p.display_group', 'p.child_count',
             'currency.iso_code AS currency', 'currency.factor AS currency_factor',
             'tax.tax_rate', 'delivery_time_translation.name AS delivery_time_name',
             'unit_translation.name AS unit_name', 'unit_translation.short_code AS unit_short_code',
-            'IF(p.parent_id IS NULL, LOWER(HEX(p.id)), LOWER(HEX(parent.parent_id))) AS group_id'
+            'IF(p.parent_id IS NULL, LOWER(HEX(p.id)), LOWER(HEX(p.parent_id))) AS group_id'
         ];
     }
 
