@@ -9,10 +9,10 @@ use Shopware\Core\Content\Product\SalesChannel\Listing\ProductListingSortingRegi
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 
 /**
- * Class ApiListingSortingAccessor
+ * Class ApiSortingModel
  * @package Boxalino\IntelligenceFramework\Framework\Content\Listing
  */
-class ApiListingSortingAccessor implements AccessorModelInterface
+class ApiSortingModel implements AccessorModelInterface
 {
 
     const BOXALINO_DEFAULT_SORT_FIELD = "score";

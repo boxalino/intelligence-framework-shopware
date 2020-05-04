@@ -160,7 +160,7 @@ abstract class ItemsAbstract implements ExporterInterface
             $t2 = $mainTable . "_" . $languageCode . "_" . $inner;
             $alias[$languageCode][$left] = $t1;
             $alias[$languageCode][$inner] = $t2;
-            $selectFields[] = "IF(ANY_VALUE($t1.$localizedFieldName) IS NULL, ANY_VALUE($t2.$localizedFieldName), ANY_VALUE($t1.$localizedFieldName)) as value_$languageCode";
+            $selectFields[] = "IF(MIN($t1.$localizedFieldName) IS NULL, MIN($t2.$localizedFieldName), MIN($t1.$localizedFieldName)) as value_$languageCode";
             $innerConditions[$languageCode] = [
                 "$mainTable.$mainTableIdField = $t2.$idField",
                 "$mainTable.$versionIdField = $t2.$versionIdField",

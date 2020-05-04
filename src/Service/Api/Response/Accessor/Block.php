@@ -2,6 +2,7 @@
 namespace Boxalino\IntelligenceFramework\Service\Api\Response\Accessor;
 
 use Boxalino\IntelligenceFramework\Service\Api\Util\AccessorHandlerInterface;
+use Boxalino\IntelligenceFramework\Service\ErrorHandler\WrongDependencyTypeException;
 
 /**
  * Class Block
@@ -141,34 +142,24 @@ class Block extends Accessor
     protected $facets;
 
     /**
-     * @param array|null $facets
-     * @return $this
-     */
-    public function setFacets(?array $facets, AccessorInterface $handler)
-    {
-        $this->facets = $handler->setFacets($facets);
-        return $this;
-    }
-
-    /**
      * @return \ArrayIterator
      */
     public function getFacets() : \ArrayIterator
     {
-        if($this->facets instanceof FacetList)
+        try{
+            $model = $this->getModel();
+            if($model instanceof AccessorFacetModelInterface)
+            {
+                $this->facets = $this->getModel()->getFacets();
+                return $this->facets;
+            }
+            throw new WrongDependencyTypeException("BoxalinoAPIBlock: the facets model must be an instance of the AccessorFacetModelInterface.");
+        } catch (\Throwable $exception)
         {
-            return $this->facets->getFacets();
+            $this->log($exception->getMessage());
         }
 
         return new \ArrayIterator();
-    }
-
-    /**
-     * @return \ArrayIterator
-     */
-    public function getCurrentFacets()
-    {
-        return $this->facets->getSelectedFacets();
     }
 
     /**

@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 namespace Boxalino\IntelligenceFramework\Framework\Request;
 
-use Boxalino\IntelligenceFramework\Framework\Content\Listing\ApiListingSortingAccessor;
+use Boxalino\IntelligenceFramework\Framework\Content\Listing\ApiSortingModel;
 use Boxalino\IntelligenceFramework\Framework\SalesChannelContextTrait;
 use Boxalino\IntelligenceFramework\Service\Api\ApiCookieSubscriber;
 use Boxalino\IntelligenceFramework\Service\Api\Request\ParameterFactory;
@@ -57,7 +57,7 @@ class RequestTransformer implements RequestTransformerInterface
     protected $parameterFactory;
 
     /**
-     * @var ApiListingSortingAccessor
+     * @var ApiSortingModel
      */
     protected $productListingSortingRegistry;
 
@@ -77,7 +77,7 @@ class RequestTransformer implements RequestTransformerInterface
         Connection $connection,
         ParameterFactory $parameterFactory,
         Configuration $configuration,
-        ApiListingSortingAccessor $productListingSortingRegistry,
+        ApiSortingModel $productListingSortingRegistry,
         LoggerInterface $logger
     ) {
         $this->productListingSortingRegistry = $productListingSortingRegistry;
@@ -282,8 +282,8 @@ class RequestTransformer implements RequestTransformerInterface
      */
     protected function addSorting(Request $request)
     {
-        $key = $request->get('sort', ApiListingSortingAccessor::BOXALINO_DEFAULT_SORT_FIELD);
-        if (!$key || $key === ApiListingSortingAccessor::BOXALINO_DEFAULT_SORT_FIELD) {
+        $key = $request->get('sort', ApiSortingModel::BOXALINO_DEFAULT_SORT_FIELD);
+        if (!$key || $key === ApiSortingModel::BOXALINO_DEFAULT_SORT_FIELD) {
             return;
         }
 

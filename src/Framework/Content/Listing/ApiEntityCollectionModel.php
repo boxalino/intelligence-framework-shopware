@@ -1,5 +1,5 @@
 <?php declare(strict_types=1);
-namespace Boxalino\IntelligenceFramework\Framework\Content;
+namespace Boxalino\IntelligenceFramework\Framework\Content\Listing;
 
 use Boxalino\IntelligenceFramework\Framework\SalesChannelContextTrait;
 use Boxalino\IntelligenceFramework\Service\Api\Response\Accessor\AccessorInterface;
@@ -13,7 +13,7 @@ use Shopware\Core\System\SalesChannel\Entity\SalesChannelRepositoryInterface;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 /**
- * Class CollectionDataProvider
+ * Class ApiEntityCollectionModel
  *
  * Item refers to any data model/logic that is desired to be rendered/displayed
  * The integrator can decide to either use all data as provided by the Narrative API,
@@ -21,7 +21,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
  *
  * @package Boxalino\IntelligenceFramework\Service\Api\Content
  */
-class CollectionDataProvider implements AccessorModelInterface
+class ApiEntityCollectionModel implements AccessorModelInterface
 {
     use SalesChannelContextTrait;
 
@@ -89,14 +89,6 @@ class CollectionDataProvider implements AccessorModelInterface
         }, $blocks->getArrayCopy());
 
         $this->hitIds = $ids;
-    }
-
-    /**
-     * @return SalesChannelContext
-     */
-    public function getSalesChannelContext() : SalesChannelContext
-    {
-        return $this->salesChannelContext;
     }
 
     /**

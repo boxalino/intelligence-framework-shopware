@@ -3,6 +3,7 @@ namespace Boxalino\IntelligenceFramework\Service\Api\Request\Context;
 
 use Boxalino\IntelligenceFramework\Framework\Request\SearchContextAbstract;
 use Boxalino\IntelligenceFramework\Service\Api\Request\ContextInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Interface SearchContextInterface
@@ -32,5 +33,4 @@ interface SearchContextInterface extends ContextInterface
      * @return SearchContextAbstract
      */
     public function setSubPhrasesProductsCount(int $subPhrasesProductsCount): SearchContextAbstract;
-
 }

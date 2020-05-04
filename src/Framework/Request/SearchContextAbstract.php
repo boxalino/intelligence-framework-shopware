@@ -1,8 +1,11 @@
 <?php declare(strict_types=1);
 namespace Boxalino\IntelligenceFramework\Framework\Request;
 
+use Boxalino\IntelligenceFramework\Framework\Content\Listing\ApiFacetModel;
+use Boxalino\IntelligenceFramework\Service\Api\Request\Context\ListingContextInterface;
 use Boxalino\IntelligenceFramework\Service\Api\Request\Context\SearchContextInterface;
 use Boxalino\IntelligenceFramework\Service\Api\Request\Definition\SearchRequestDefinitionInterface;
+use Boxalino\IntelligenceFramework\Service\Api\Request\ParameterFactory;
 use Boxalino\IntelligenceFramework\Service\Api\Request\RequestDefinitionInterface;
 use Boxalino\IntelligenceFramework\Service\ErrorHandler\WrongDependencyTypeException;
 use PhpParser\Error;
@@ -16,7 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 abstract class SearchContextAbstract
     extends ContextAbstract
-    implements SearchContextInterface, ShopwareApiContextInterface
+    implements SearchContextInterface, ShopwareApiContextInterface, ListingContextInterface
 {
 
     /**
@@ -49,7 +52,48 @@ abstract class SearchContextAbstract
             $this->getApiRequest()->setMaxSubPhrasesHits($this->getSubPhrasesProductsCount());
         }
 
+        $this->addFacets($request);
+
         return $this->getApiRequest();
+    }
+
+    /**
+     * Filter the list of query parameters by either being a product property or a defined property used in filter
+     *
+     * @param Request $request
+     * @return SearchContextAbstract
+     */
+    public function addFacets(Request $request): SearchContextAbstract
+    {
+        foreach($request->query->all() as $param => $values)
+        {
+            if(strpos($param, ApiFacetModel::BOXALINO_STORE_FACET_PREFIX)===0)
+            {
+                //it`s a store property
+                $values = is_array($values) ? $values : explode("|", $values);
+                $values = array_map("html_entity_decode", $values);
+                $this->getApiRequest()->addFacets(
+                    $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FACET)
+                    ->addWithValues($param, $values)
+                );
+            }
+        }
+
+        $minPrice = $request->query->getInt('min-price', 0);
+        $maxPrice = $request->query->getInt('max-price', 0);
+        if($minPrice > 0 || $maxPrice > 0)
+        {
+            if($maxPrice==0)
+            {
+                $maxPrice = null;
+            }
+            $this->getApiRequest()->addFacets(
+                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FACET)
+                    ->addRange("discountedPrice", $minPrice, $maxPrice)
+            );
+        }
+
+        return $this;
     }
 
     /**

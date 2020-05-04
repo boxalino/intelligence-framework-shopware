@@ -1,7 +1,7 @@
 <?php
 namespace Boxalino\IntelligenceFramework\Framework\Content\Page;
 
-use Boxalino\IntelligenceFramework\Framework\Content\CollectionDataProvider;
+use Boxalino\IntelligenceFramework\Framework\Content\Listing\ApiEntityCollectionModel;
 use Boxalino\IntelligenceFramework\Service\Api\ApiCallServiceInterface;
 use Boxalino\IntelligenceFramework\Service\Api\Response\Accessor\AccessorInterface;
 use Boxalino\IntelligenceFramework\Service\Api\Response\Accessor\Block;
@@ -89,7 +89,7 @@ class ApiCrossSellingLoader extends ApiLoader
              * will be valid content
              */
             if(property_exists($block, "model")
-                && $block->getModel() instanceof CollectionDataProvider
+                && $block->getModel() instanceof ApiEntityCollectionModel
                 && property_exists($block, "productsCollection")
             ){
                 $index++;

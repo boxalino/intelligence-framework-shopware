@@ -18,8 +18,8 @@
             <argument type="service" id="Shopware\Storefront\Page\GenericPageLoader"/>
         </service>
 
-        <!-- Shopware6 collection EntitySearchResult service -->
-        <service id="boxalino.api.content.collection" class="Boxalino\IntelligenceFramework\Framework\Content\CollectionDataProvider"
+        <!-- Shopware6 collection EntitySearchResult service (used in layout block definition) -->
+        <service id="boxalino.api.content.collection" class="Boxalino\IntelligenceFramework\Framework\Content\Listing\ApiEntityCollectionModel"
                  public="true" shared="false">
             <argument type="service" id="sales_channel.product.repository"/>
         </service>
@@ -31,8 +31,8 @@
             <argument type="service" id="sales_channel.product.repository"/>
         </service>
 
-        <!-- Shopware6 - Boxalino sorting handler -->
-        <service id="Boxalino\IntelligenceFramework\Framework\Content\Listing\ApiListingSortingAccessor" public="true">
+        <!-- Shopware6 - Boxalino sorting model (used in layout block definition) -->
+        <service id="Boxalino\IntelligenceFramework\Framework\Content\Listing\ApiSortingModel" public="true">
             <argument type="service" id="Shopware\Core\Content\Product\SalesChannel\Listing\ProductListingSortingRegistry"/>
             <call method="add">
                 <argument type="collection">
@@ -42,6 +42,11 @@
                     <argument key="_score">score</argument>
                 </argument>
             </call>
+        </service>
+
+        <!-- Shopware6 - Boxalino facet handler model (used in layout block definition) -->
+        <service id="Boxalino\IntelligenceFramework\Framework\Content\Listing\ApiFacetModel" public="true">
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
         </service>
     </services>
 

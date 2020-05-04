@@ -129,7 +129,7 @@ class Configuration extends \Boxalino\IntelligenceFramework\Service\Util\Configu
             'LOWER(HEX(sales_channel.language_id)) AS sales_channel_default_language_id',
             'LOWER(HEX(sales_channel.currency_id)) AS sales_channel_default_currency_id',
             'LOWER(HEX(sales_channel.customer_group_id)) as sales_channel_customer_group_id',
-            'ANY_VALUE(channel.name) as sales_channel_name',
+            'MIN(channel.name) as sales_channel_name',
             "GROUP_CONCAT(SUBSTR(locale.code, 1, 2) SEPARATOR ',') as sales_channel_languages_locale",
             "GROUP_CONCAT(LOWER(HEX(language.id)) SEPARATOR ',') as sales_channel_languages_id",
             'LOWER(HEX(sales_channel.navigation_category_id)) as sales_channel_navigation_category_id',

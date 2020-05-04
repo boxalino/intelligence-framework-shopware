@@ -56,6 +56,11 @@ class ApiResponsePage extends Page
     protected $totalHitCount = 0;
 
     /**
+     * @var string
+     */
+    protected $searchTerm;
+
+    /**
      * @return array
      */
     public function getSortings(): array
@@ -215,4 +220,21 @@ class ApiResponsePage extends Page
         return $this;
     }
 
+    /**
+     * @param string $searchTerm
+     * @return $this
+     */
+    public function setSearchTerm(string $searchTerm) : ApiResponsePage
+    {
+        $this->searchTerm = $searchTerm;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSearchTerm() : string
+    {
+        return $this->searchTerm;
+    }
 }

@@ -12,11 +12,6 @@
                 <argument>Boxalino\IntelligenceFramework\Service\Api\Response\Accessor\Sort</argument>
             </call>
             <call method="addAccessor">
-                <argument>bx-facets</argument>
-                <argument>facets</argument>
-                <argument>Boxalino\IntelligenceFramework\Service\Api\Response\Accessor\FacetList</argument>
-            </call>
-            <call method="addAccessor">
                 <argument>facet</argument>
                 <argument>facet</argument>
                 <argument>Boxalino\IntelligenceFramework\Service\Api\Response\Accessor\Facet</argument>
@@ -54,6 +49,11 @@
             <call method="addAccessor">
                 <argument>bx-acQueries</argument>
                 <argument>suggestionsCollection</argument>
+                <argument>Boxalino\IntelligenceFramework\Service\Api\Response\Accessor\BxAccessor</argument>
+            </call>
+            <call method="addAccessor">
+                <argument>bx-facets</argument>
+                <argument>facetsList</argument>
                 <argument>Boxalino\IntelligenceFramework\Service\Api\Response\Accessor\BxAccessor</argument>
             </call>
             <!-- set the product property ID field as used in the requests -->

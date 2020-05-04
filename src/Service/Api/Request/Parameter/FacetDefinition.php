@@ -25,15 +25,15 @@ class FacetDefinition extends ParameterDefinition
      * @param string $field
      * @param array $values
      * @param bool $urlField
-     * @param bool $urlValues
+     * @param string|null $valueKey
      * @return FacetDefinition
      */
-    public function addWithValues(string $field, array $values, bool $urlField = false, bool $urlValues = false) : self
+    public function addWithValues(string $field, array $values, bool $urlField = false, ?string $valueKey = null) : self
     {
         $this->field = $field;
         $this->urlField = $urlField;
         $this->values = $values;
-        $this->urlValues = $urlValues;
+        $this->valueKey = $valueKey;
 
         return $this;
     }
@@ -41,11 +41,11 @@ class FacetDefinition extends ParameterDefinition
     /**
      * @param string $field
      * @param float $from
-     * @param float $to
+     * @param float | null $to
      * @param bool $boundsOnly
      * @return FacetDefinition
      */
-    public function addRange(string $field, float $from, float $to) : self
+    public function addRange(string $field, float $from, ?float $to) : self
     {
         $this->field = $field;
         $this->from = $from;

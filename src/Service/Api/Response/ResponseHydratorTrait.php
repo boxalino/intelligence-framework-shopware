@@ -62,7 +62,7 @@ trait ResponseHydratorTrait
                 /** the facets is returned as a list instead of a model itself */
                 if($propertyName === 'bx-facets')
                 {
-                    #$object->setFacets($value, $handler);
+                    $object->set($objectProperty, $value);
                     continue;
                 }
 

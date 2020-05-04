@@ -11,7 +11,7 @@
             <argument type="service" id="Doctrine\DBAL\Connection"/>
             <argument type="service" id="boxalino.api.request.parameter.factory"/>
             <argument type="service" id="boxalino.api.util.configurator"/>
-            <argument type="service" id="Boxalino\IntelligenceFramework\Framework\Content\Listing\ApiListingSortingAccessor"/>
+            <argument type="service" id="Boxalino\IntelligenceFramework\Framework\Content\Listing\ApiSortingModel"/>
             <argument type="service" id="monolog.logger.boxalino"/>
         </service>
         <service id="Boxalino\IntelligenceFramework\Framework\Request\ShopwareApiContextInterface"
