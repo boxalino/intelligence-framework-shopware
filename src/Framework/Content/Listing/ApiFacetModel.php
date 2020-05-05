@@ -6,7 +6,6 @@ use Boxalino\IntelligenceFramework\Service\Api\Response\Accessor\Accessor;
 use Boxalino\IntelligenceFramework\Service\Api\Response\Accessor\AccessorFacetModelInterface;
 use Boxalino\IntelligenceFramework\Service\Api\Response\Accessor\AccessorInterface;
 use Boxalino\IntelligenceFramework\Service\Api\Response\Accessor\AccessorModelInterface;
-use Boxalino\IntelligenceFramework\Service\Api\Response\Accessor\FacetList;
 use Boxalino\IntelligenceFramework\Service\Api\Response\ResponseHydratorTrait;
 use Boxalino\IntelligenceFramework\Service\Api\Util\AccessorHandlerInterface;
 use Doctrine\DBAL\Connection;
