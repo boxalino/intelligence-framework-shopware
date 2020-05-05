@@ -139,10 +139,12 @@ class ApiFacetModel implements AccessorFacetModelInterface
             ->from("property_group_translation")
             ->leftJoin("property_group_translation", "property_group_translation", "pgt",
                 "property_group_translation.property_group_id = pgt.property_group_id AND pgt.language_id=:defaultLanguageId")
-            ->where("property_group_translation.langauge_id = :languageId")
+            ->where("property_group_translation.language_id = :languageId")
+            ->where('property_group_translation.property_group_id = :propertyId')
             ->groupBy("property_group_translation.property_group_id")
-            ->setParameter("languageId", Uuid::fromHexToBytes($channelSelectedLanguage), ParameterType::STRING)
-            ->setParameter("defaultLanguageId", Uuid::fromHexToBytes($this->getDefaultLanguageId()), ParameterType::STRING)
+            ->setParameter("languageId", Uuid::fromHexToBytes($channelSelectedLanguage), ParameterType::BINARY)
+            ->setParameter("defaultLanguageId", Uuid::fromHexToBytes($this->getDefaultLanguageId()), ParameterType::BINARY)
+            ->setParameter("propertyId", Uuid::fromHexToBytes($propertyId), ParameterType::BINARY)
             ->setMaxResults(1);
 
         return $query->execute()->fetchColumn();
@@ -157,7 +159,7 @@ class ApiFacetModel implements AccessorFacetModelInterface
     {
         $prefix = self::BOXALINO_STORE_FACET_PREFIX;
         $propertyIdQuery = $this->connection->createQueryBuilder()
-            ->select(["property_group_id"])
+            ->select(["LOWER(HEX(property_group_id))"])
             ->from("property_group_translation")
             ->where("language_id = :defaultLanguageId")
             ->where("CONCAT('$prefix', name) = :propertyName")

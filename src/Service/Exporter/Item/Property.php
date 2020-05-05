@@ -28,7 +28,7 @@ class Property extends PropertyTranslation
         $properties = $this->getPropertyNames();
         foreach($properties as $property)
         {
-            $this->property = $property['name']; $this->setPropertyId($property['property_group_id']);
+            $this->setProperty($property['name']); $this->setPropertyId($property['property_group_id']);
             $this->logger->info("BxIndexLog: Preparing products - START $this->property EXPORT.");
             $totalCount = 0; $page = 1; $data=[]; $header = true;
             while (Product::EXPORTER_LIMIT > $totalCount + Product::EXPORTER_STEP)
@@ -126,6 +126,16 @@ class Property extends PropertyTranslation
     public function getItemMainFile() : string
     {
         return "$this->property.csv";
+    }
+
+    /**
+     * @param string $property
+     * @return $this
+     */
+    protected function setProperty(string $property)
+    {
+        $this->property =  strtolower(str_replace("", "_", $property));
+        return $this;
     }
 
     /**
