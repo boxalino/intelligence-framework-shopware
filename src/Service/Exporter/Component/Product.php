@@ -166,7 +166,7 @@ class Product extends ExporterComponentAbstract
                 ->leftJoin('p', 'delivery_time_translation', 'delivery_time_translation',
                     'p.delivery_time_id = delivery_time_translation.delivery_time_id AND delivery_time_translation.language_id = :defaultLanguage')
                 ->leftJoin('p', 'unit_translation', 'unit_translation', 'unit_translation.unit_id = p.unit_id AND unit_translation.language_id = :defaultLanguage')
-                ->leftJoin('p', 'currency', 'currency', "JSON_UNQUOTE(JSON_EXTRACT(p.price->>'$.*.currencyId', '$[0]')) = LOWER(HEX(currency.id))")
+                ->leftJoin('p', 'currency', 'currency', "JSON_UNQUOTE(JSON_EXTRACT(JSON_EXTRACT(p.price, '$.*.currencyId'),'$[0]')) = LOWER(HEX(currency.id))")
                 ->andWhere('p.version_id = :live')
                 ->andWhere("JSON_SEARCH(p.category_tree, 'one', :channelRootCategoryId) IS NOT NULL")
                 ->addGroupBy('p.id')

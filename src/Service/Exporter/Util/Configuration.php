@@ -24,7 +24,7 @@ class Configuration extends \Boxalino\IntelligenceFramework\Service\Util\Configu
         "status",
         "account",
         "password",
-        "index",
+        "devIndex",
         "export",
         "exportPublishConfig",
         "exportProductImages",
