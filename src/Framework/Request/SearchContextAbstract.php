@@ -83,10 +83,6 @@ abstract class SearchContextAbstract
         $maxPrice = $request->query->getInt('max-price', 0);
         if($minPrice > 0 || $maxPrice > 0)
         {
-            if($maxPrice==0)
-            {
-                $maxPrice = null;
-            }
             $this->getApiRequest()->addFacets(
                 $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FACET)
                     ->addRange("discountedPrice", $minPrice, $maxPrice)

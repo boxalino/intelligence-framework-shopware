@@ -28,6 +28,11 @@ interface ApiCallServiceInterface
     public function isFallback() : bool;
 
     /**
+     * @return string|null
+     */
+    public function getFallbackMessage() : ?string;
+
+    /**
      * @return ResponseDefinitionInterface
      */
     public function getApiResponse() : ResponseDefinitionInterface;

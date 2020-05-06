@@ -370,7 +370,7 @@ class Product extends ExporterComponentAbstract
             'IF(p.parent_id IS NULL, p.ean, IF(p.ean IS NULL, parent.ean, p.ean)) AS ean',
             'p.stock', 'p.available_stock', 'p.available',
             'IF(p.parent_id IS NULL, p.restock_time, IF(p.restock_time IS NULL, parent.restock_time, p.restock_time)) AS restock_time',
-            'IF(p.parent_id IS NULL, p.is_closeout, IF(p.is_closeout IS NULL, parent.is_closeout, p.is_closeout) AS is_closeout',
+            'IF(p.parent_id IS NULL, p.is_closeout, IF(p.is_closeout IS NULL, parent.is_closeout, p.is_closeout)) AS is_closeout',
             'p.purchase_steps', 'p.max_purchase', 'p.min_purchase', 'p.purchase_unit', 'p.reference_unit',
             'IF(p.parent_id IS NULL, p.shipping_free, IF(p.shipping_free IS NULL, parent.shipping_free, p.shipping_free)) AS shipping_free',
             'IF(p.parent_id IS NULL, p.purchase_price, IF(p.purchase_price IS NULL, parent.purchase_price, p.purchase_price)) AS purchase_price',

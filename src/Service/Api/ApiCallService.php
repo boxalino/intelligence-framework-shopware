@@ -42,6 +42,11 @@ class ApiCallService implements ApiCallServiceInterface
     protected $responseDefinition;
 
     /**
+     * @var null | string
+     */
+    protected $fallbackMessage = null;
+
+    /**
      * ApiCallService constructor.
      * @param LoggerInterface $logger
      */
@@ -78,6 +83,7 @@ class ApiCallService implements ApiCallServiceInterface
         } catch (\Exception $exception)
         {
             $this->setFallback(true);
+            $this->setFallbackMessage($exception->getMessage());
             $this->logger->error("BoxalinoAPIError: " . $exception->getMessage() . " at " . __CLASS__);
         }
 
@@ -100,6 +106,24 @@ class ApiCallService implements ApiCallServiceInterface
     public function isFallback() : bool
     {
         return $this->fallback;
+    }
+
+    /**
+     * @param string $message
+     * @return $this
+     */
+    public function setFallbackMessage(string $message) : self
+    {
+        $this->fallbackMessage = $message;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getFallbackMessage() : ?string
+    {
+        return $this->fallbackMessage;
     }
 
     /**

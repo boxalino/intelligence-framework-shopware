@@ -59,13 +59,17 @@ trait ResponseHydratorTrait
                     continue;
                 }
 
-                /** the facets is returned as a list instead of a model itself */
+                /** the facets is returned as a list/[] instead of a model itself */
                 if($propertyName === 'bx-facets')
                 {
                     $object->set($objectProperty, $value);
                     continue;
                 }
 
+                if(is_array($value))
+                {
+                    $value = array_pop($value);
+                }
                 $valueObject = $this->toObject($value, $handler);
                 $object->set($objectProperty, $valueObject);
 

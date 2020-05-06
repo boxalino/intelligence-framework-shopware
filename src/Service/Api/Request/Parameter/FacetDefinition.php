@@ -45,11 +45,14 @@ class FacetDefinition extends ParameterDefinition
      * @param bool $boundsOnly
      * @return FacetDefinition
      */
-    public function addRange(string $field, float $from, ?float $to) : self
+    public function addRange(string $field, float $from, float $to) : self
     {
         $this->field = $field;
         $this->from = $from;
-        $this->to = $to;
+        if($to > 0)
+        {
+            $this->to = $to;
+        }
         $this->boundsOnly = true;
         $this->numerical = true;
         $this->range = true;

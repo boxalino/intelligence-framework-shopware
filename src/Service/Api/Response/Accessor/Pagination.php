@@ -94,7 +94,7 @@ class Pagination extends Accessor
      */
     public function getCurrentPage()
     {
-        $this->currentPage = ceil($this->getOffset() / $this->getPageSize());
+        $this->currentPage = ceil($this->getOffset() / $this->getPageSize()) + 1;
         if($this->currentPage)
         {
             return $this->currentPage;

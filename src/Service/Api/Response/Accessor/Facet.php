@@ -484,12 +484,12 @@ class Facet extends Accessor
     {
         if(is_null($this->selectedValues))
         {
-            $this->selectedValues = array_map(function(AccessorInterface $facetValue) {
+            $this->selectedValues = array_filter(array_map(function(AccessorInterface $facetValue) {
                 if($facetValue->isSelected())
                 {
                     return $facetValue;
                 }
-            }, $this->values->getArrayCopy());
+            }, $this->getValues()->getArrayCopy()));
         }
 
         return $this->selectedValues;

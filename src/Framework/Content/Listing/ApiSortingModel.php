@@ -121,6 +121,8 @@ class ApiSortingModel implements AccessorModelInterface
                 $reverse = mb_strtoupper($direction) === FieldSorting::DESCENDING ?? false;
                 $mapping[] = ["field" => $this->getRequestField($field), "reverse" => $reverse];
             }
+
+            return $mapping;
         }
 
         return [];
@@ -183,6 +185,7 @@ class ApiSortingModel implements AccessorModelInterface
 
     /**
      * Setting the active sorting
+     *
      * @param AccessorInterface $responseSorting
      * @return $this
      */

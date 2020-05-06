@@ -10,6 +10,7 @@ use Doctrine\DBAL\ParameterType;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\Defaults;
+use Shopware\Core\Profiling\Checkout\SalesChannelContextServiceProfiler;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 
 /**
@@ -34,7 +35,8 @@ class Price extends ItemsAbstract
         Connection $connection,
         LoggerInterface $boxalinoLogger,
         Configuration $exporterConfigurator,
-        SalesChannelContextService $salesChannelContextService
+        #SalesChannelContextService $salesChannelContextService
+        SalesChannelContextServiceProfiler $salesChannelContextService
     ){
         $this->salesChannelContextService = $salesChannelContextService;
         parent::__construct($connection, $boxalinoLogger, $exporterConfigurator);

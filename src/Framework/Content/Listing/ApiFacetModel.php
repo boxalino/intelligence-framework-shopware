@@ -2,23 +2,15 @@
 namespace Boxalino\IntelligenceFramework\Framework\Content\Listing;
 
 use Boxalino\IntelligenceFramework\Framework\SalesChannelContextTrait;
-use Boxalino\IntelligenceFramework\Service\Api\Response\Accessor\Accessor;
 use Boxalino\IntelligenceFramework\Service\Api\Response\Accessor\AccessorFacetModelInterface;
 use Boxalino\IntelligenceFramework\Service\Api\Response\Accessor\AccessorInterface;
 use Boxalino\IntelligenceFramework\Service\Api\Response\Accessor\AccessorModelInterface;
 use Boxalino\IntelligenceFramework\Service\Api\Response\ResponseHydratorTrait;
 use Boxalino\IntelligenceFramework\Service\Api\Util\AccessorHandlerInterface;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\FetchMode;
 use Doctrine\DBAL\ParameterType;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Content\Cms\DataResolver\CriteriaCollection;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
-use Shopware\Core\System\SalesChannel\Entity\SalesChannelRepositoryInterface;
-use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 /**
  * Class ApiFacetModel
@@ -95,13 +87,13 @@ class ApiFacetModel implements AccessorFacetModelInterface
         {
             $facet = $this->toObject($facet, $this->getAccessorHandler()->getAccessor("facet"));
             $this->facets->append($facet);
-            if($facet->isSelected())
-            {
-                $this->addSelectedFacet($facet);
-            }
             if($facet->getLabel() === "")
             {
                 $facet->setLabel($this->getLabel($facet->getField()));
+            }
+            if($facet->isSelected())
+            {
+                $this->addSelectedFacet($facet);
             }
         }
 
@@ -119,6 +111,55 @@ class ApiFacetModel implements AccessorFacetModelInterface
     }
 
     /**
+     * @return bool
+     */
+    public function hasSelectedFacets() : bool
+    {
+        return (bool) $this->selectedFacets->count();
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasFacets() : bool
+    {
+        return (bool) $this->facets->count();
+    }
+
+    /**
+     * Sets the facets
+     * Sets the accesor handler to be able to run toObject construct
+     *
+     * @param null | AccessorInterface $context
+     * @return AccessorModelInterface
+     */
+    public function addAccessorContext(?AccessorInterface $context = null): AccessorModelInterface
+    {
+        $this->setSalesChannelContext($context->getAccessorHandler()->getSalesChannelContext());
+        $this->setAccessorHandler($context->getAccessorHandler());
+        $this->setFacets($context->getFacetsList());
+        return $this;
+    }
+
+    /**
+     * @return AccessorHandlerInterface
+     */
+    public function getAccessorHandler(): AccessorHandlerInterface
+    {
+        return $this->accessorHandler;
+    }
+
+    /**
+     * @param AccessorHandlerInterface $accessorHandler
+     * @return $this
+     */
+    public function setAccessorHandler(AccessorHandlerInterface $accessorHandler)
+    {
+        $this->accessorHandler = $accessorHandler;
+        return $this;
+    }
+
+    /**
      * Accessing property name from DB
      *
      * @param string $propertyName
@@ -131,6 +172,10 @@ class ApiFacetModel implements AccessorFacetModelInterface
         $propertyId = $this->getPropertyIdByFieldName($propertyName);
         if(!$propertyId)
         {
+            if(strpos($propertyName, self::BOXALINO_STORE_FACET_PREFIX)===0)
+            {
+                $propertyName = substr($propertyName, strlen(self::BOXALINO_STORE_FACET_PREFIX), strlen($propertyName));
+            }
             return ucwords(str_replace("_", " ", $propertyName));
         }
 
@@ -188,55 +233,6 @@ class ApiFacetModel implements AccessorFacetModelInterface
         }
 
         return $this->defaultLanguageId;
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasSelectedFacets() : bool
-    {
-        return (bool) $this->selectedFacets->count();
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasFacets() : bool
-    {
-        return (bool) $this->facets->count();
-    }
-
-    /**
-     * Sets the facets
-     * Sets the accesor handler to be able to run toObject construct
-     *
-     * @param null | AccessorInterface $context
-     * @return AccessorModelInterface
-     */
-    public function addAccessorContext(?AccessorInterface $context = null): AccessorModelInterface
-    {
-        $this->setSalesChannelContext($context->getAccessorHandler()->getSalesChannelContext());
-        $this->setAccessorHandler($context->getAccessorHandler());
-        $this->setFacets($context->getFacetsList());
-        return $this;
-    }
-
-    /**
-     * @return AccessorHandlerInterface
-     */
-    public function getAccessorHandler(): AccessorHandlerInterface
-    {
-        return $this->accessorHandler;
-    }
-
-    /**
-     * @param AccessorHandlerInterface $accessorHandler
-     * @return $this
-     */
-    public function setAccessorHandler(AccessorHandlerInterface $accessorHandler)
-    {
-        $this->accessorHandler = $accessorHandler;
-        return $this;
     }
 
 }

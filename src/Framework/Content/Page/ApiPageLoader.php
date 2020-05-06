@@ -12,6 +12,7 @@ use Shopware\Core\Framework\Routing\Exception\MissingRequestParameterException;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Framework\Page\StorefrontSearchResult;
 use Shopware\Storefront\Page\GenericPageLoader;
+use Shopware\Storefront\Page\Page;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -61,9 +62,7 @@ class ApiPageLoader extends ApiLoader
 
         if($this->apiCallService->isFallback())
         {
-            /**
-             * @TODO implement fallback scenario (possible parrent call)
-             */
+            throw new \Exception($this->apiCallService->getFallbackMessage());
         }
 
         /** this is a required step */
