@@ -152,10 +152,23 @@ class ResponseDefinition implements ResponseDefinitionInterface
     public function isCorrectedSearchQuery() : bool
     {
         try{
-           return (bool) $this->get()->advanced->system->correctedSearchQuery;
+           return (bool) $this->get()->system->correctedSearchQuery;
         } catch(\Exception $exception)
         {
             return false;
+        }
+    }
+
+    /**
+     * @return string | null
+     */
+    public function getCorrectedSearchQuery() : ?string
+    {
+        try{
+            return $this->get()->system->correctedSearchQuery;
+        } catch(\Exception $exception)
+        {
+            return null;
         }
     }
 

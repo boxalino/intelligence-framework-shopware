@@ -77,8 +77,12 @@ class ApiPageLoader extends ApiLoader
         $page->setRedirectUrl($this->apiCallService->getApiResponse()->getRedirectUrl());
         $page->setTotalHitCount($this->apiCallService->getApiResponse()->getHitCount());
         $page->setSearchTerm(
-            (string) $request->query->get('search')
+            (string) $request->query->get('search', "")
         );
+        if($this->apiCallService->getApiResponse()->isCorrectedSearchQuery())
+        {
+            $page->setSearchTerm((string) $this->apiCallService->getApiResponse()->getCorrectedSearchQuery());
+        }
 
         $this->eventDispatcher->dispatch(
             new ApiPageLoadedEvent($page, $salesChannelContext, $request)

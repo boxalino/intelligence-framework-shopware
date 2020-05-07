@@ -13,7 +13,7 @@ class FacetValue extends Accessor
     /**
      * @var string
      */
-    protected $value;
+    protected $value = null;
 
     /**
      * @var null | string
@@ -56,9 +56,19 @@ class FacetValue extends Accessor
     protected $url;
 
     /**
+     * @var null | string
+     */
+    protected $maxSelectedValue = null;
+
+    /**
+     * @var null | string
+     */
+    protected $minSelectedValue = null;
+
+    /**
      * @return string
      */
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }
@@ -100,12 +110,12 @@ class FacetValue extends Accessor
     }
 
     /**
-     * @param string $id
+     * @param array $id
      * @return FacetValue
      */
-    public function setId(string $id): FacetValue
+    public function setId(array $id): FacetValue
     {
-        $this->id = $id;
+        $this->id = $id[0];
         return $this;
     }
 
@@ -214,6 +224,42 @@ class FacetValue extends Accessor
     public function setUrl(?string $url): FacetValue
     {
         $this->url = $url;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getMaxSelectedValue(): ?string
+    {
+        return $this->maxSelectedValue;
+    }
+
+    /**
+     * @param string|null $maxSelectedValue
+     * @return FacetValue
+     */
+    public function setMaxSelectedValue(?string $maxSelectedValue): FacetValue
+    {
+        $this->maxSelectedValue = $maxSelectedValue;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getMinSelectedValue(): ?string
+    {
+        return $this->minSelectedValue;
+    }
+
+    /**
+     * @param string|null $minSelectedValue
+     * @return FacetValue
+     */
+    public function setMinSelectedValue(?string $minSelectedValue): FacetValue
+    {
+        $this->minSelectedValue = $minSelectedValue;
         return $this;
     }
 

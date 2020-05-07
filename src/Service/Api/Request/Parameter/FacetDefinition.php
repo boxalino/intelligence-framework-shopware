@@ -48,7 +48,10 @@ class FacetDefinition extends ParameterDefinition
     public function addRange(string $field, float $from, float $to) : self
     {
         $this->field = $field;
-        $this->from = $from;
+        if($from > 0)
+        {
+            $this->from = $from;
+        }
         if($to > 0)
         {
             $this->to = $to;

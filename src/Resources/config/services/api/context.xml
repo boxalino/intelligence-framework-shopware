@@ -31,12 +31,16 @@
                  parent="Boxalino\IntelligenceFramework\Framework\Request\ShopwareApiContextInterface"
                  abstract="true">
         </service>
+        <service id="Boxalino\IntelligenceFramework\Service\Api\Request\Context\ListingContextInterface"
+                 class="Boxalino\IntelligenceFramework\Framework\Request\ListingContextAbstract"
+                 parent="Boxalino\IntelligenceFramework\Framework\Request\ShopwareApiContextInterface"
+                 abstract="true">
+        </service>
         <service id="Boxalino\IntelligenceFramework\Service\Api\Request\Context\SearchContextInterface"
                  class="Boxalino\IntelligenceFramework\Framework\Request\SearchContextAbstract"
                  parent="Boxalino\IntelligenceFramework\Framework\Request\ShopwareApiContextInterface"
                  abstract="true">
         </service>
-
     </services>
 
 </container>

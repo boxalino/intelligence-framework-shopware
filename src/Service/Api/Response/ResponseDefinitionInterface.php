@@ -25,6 +25,11 @@ interface ResponseDefinitionInterface
     public function isCorrectedSearchQuery() : bool;
 
     /**
+     * @return string|null
+     */
+    public function getCorrectedSearchQuery() : ?string;
+
+    /**
      * @return bool
      */
     public function hasSearchSubPhrases() : bool;
