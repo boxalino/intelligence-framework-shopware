@@ -2,10 +2,8 @@
 namespace Boxalino\IntelligenceFramework\Framework\Request;
 
 use Boxalino\IntelligenceFramework\Framework\Content\Listing\ApiFacetModel;
-use Boxalino\IntelligenceFramework\Framework\Content\Listing\ApiSortingModel;
 use Boxalino\IntelligenceFramework\Service\Api\Request\Context\ListingContextInterface;
-use Boxalino\IntelligenceFramework\Service\Api\Request\Context\SearchContextInterface;
-use Boxalino\IntelligenceFramework\Service\Api\Request\Definition\SearchRequestDefinitionInterface;
+use Boxalino\IntelligenceFramework\Service\Api\Request\Definition\ListingRequestDefinitionInterface;
 use Boxalino\IntelligenceFramework\Service\Api\Request\ParameterFactory;
 use Boxalino\IntelligenceFramework\Service\Api\Request\RequestDefinitionInterface;
 use Boxalino\IntelligenceFramework\Service\ErrorHandler\WrongDependencyTypeException;
@@ -22,12 +20,6 @@ abstract class ListingContextAbstract
     extends ContextAbstract
     implements ShopwareApiContextInterface, ListingContextInterface
 {
-
-
-    /**
-     * @var array
-     */
-    protected $rangeProperties = [];
 
     /**
      * Adding  facets from the request
@@ -97,6 +89,11 @@ abstract class ListingContextAbstract
         return $this;
     }
 
-    abstract function getRangeProperties() : array;
+    /**
+     * Range properties definition as used in the projects
+     *
+     * @return array
+     */
+    abstract public function getRangeProperties() : array;
 
 }

@@ -41,6 +41,11 @@
                  parent="Boxalino\IntelligenceFramework\Framework\Request\ShopwareApiContextInterface"
                  abstract="true">
         </service>
+        <service id="boxalino.request.context.cms"
+                 class="Boxalino\IntelligenceFramework\Framework\Request\CmsContextAbstract"
+                 parent="Boxalino\IntelligenceFramework\Service\Api\Request\Context\ListingContextInterface"
+                 abstract="true">
+        </service>
     </services>
 
 </container>

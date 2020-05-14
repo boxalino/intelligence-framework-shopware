@@ -24,7 +24,8 @@ Shopware.Service('cmsService').registerCmsBlock({
             type: 'narrative',
             default: {
                 config: {
-                    context: { source: 'static', value: 'listing' }
+                    groupBy: {value: 'products_group_id' },
+                    categoryFilter: { value: 'navigation' }
                 }
             }
         }

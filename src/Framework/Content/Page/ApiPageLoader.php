@@ -57,16 +57,12 @@ class ApiPageLoader extends ApiLoader
         $page = $this->genericLoader->load($request, $salesChannelContext);
         $page = ApiResponsePage::createFrom($page);
 
-        $this->apiContextInterface->setSalesChannelContext($salesChannelContext);
         $this->call($request, $salesChannelContext);
 
         if($this->apiCallService->isFallback())
         {
             throw new \Exception($this->apiCallService->getFallbackMessage());
         }
-
-        /** this is a required step */
-        $this->apiCallService->getApiResponse()->getAccessorHandler()->setSalesChannelContext($salesChannelContext);
 
         /** set page properties */
         $page->setBlocks($this->apiCallService->getApiResponse()->getBlocks());

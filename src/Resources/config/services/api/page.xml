@@ -48,6 +48,9 @@
         <service id="Boxalino\IntelligenceFramework\Framework\Content\Listing\ApiFacetModel" public="true">
             <argument type="service" id="Doctrine\DBAL\Connection"/>
         </service>
+
+        <!-- Shopware6 - Boxalino facet handler model (used in layout block definition) -->
+        <service id="Boxalino\IntelligenceFramework\Framework\Content\Listing\ApiCmsModel" public="true"/>
     </services>
 
 </container>

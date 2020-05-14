@@ -5,9 +5,9 @@
 
     <imports>
         <import resource="api/accessor.xml"/>
-        <import resource="api/page.xml"/>
         <import resource="api/context.xml"/>
         <import resource="api/definition.xml"/>
+        <import resource="api/page.xml"/>
     </imports>
 
     <services>

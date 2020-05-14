@@ -27,4 +27,23 @@ interface ContextInterface
      * @return RequestDefinitionInterface
      */
     public function getApiRequest() : RequestDefinitionInterface;
+
+    /**
+     * @param string $property
+     * @param  string | bool $value
+     * @return mixed
+     */
+    public function set(string $property, $value);
+
+    /**
+     * @param string $property
+     * @return bool
+     */
+    public function has(string $property) : bool;
+
+    /**
+     * @param string $property
+     * @return string | bool | void
+     */
+    public function getProperty(string $property);
 }

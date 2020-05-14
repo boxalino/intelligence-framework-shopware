@@ -31,11 +31,6 @@ class ApiResponsePage extends Page
     protected $fallback = false;
 
     /**
-     * @var array
-     */
-    protected $sortings = [];
-
-    /**
      * @var string
      */
     protected $variantUuid;
@@ -59,22 +54,6 @@ class ApiResponsePage extends Page
      * @var string
      */
     protected $searchTerm;
-
-    /**
-     * @return array
-     */
-    public function getSortings(): array
-    {
-        return $this->sortings;
-    }
-
-    /**
-     * @param array $sortings
-     */
-    public function setSortings(array $sortings): void
-    {
-        $this->sortings = $sortings;
-    }
 
     /**
      * @return \ArrayIterator

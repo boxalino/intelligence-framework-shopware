@@ -76,9 +76,6 @@ class ApiCrossSellingLoader extends ApiLoader
             return $crossSellingLoaderResult;
         }
 
-        /** this is a required step */
-        $this->apiCallService->getApiResponse()->getAccessorHandler()->setSalesChannelContext($salesChannelContext);
-
         $this->setCrossSellingResponseCollection($salesChannelContext);
         $result = new CrossSellingLoaderResult(); $index = 0;
         foreach ($this->apiCallService->getApiResponse()->getBlocks() as $block)

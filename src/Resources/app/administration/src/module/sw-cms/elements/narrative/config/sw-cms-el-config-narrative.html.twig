@@ -3,16 +3,40 @@
         {% block sw_cms_element_narrative_config_widget %}
             <sw-field v-model="element.config.widget.value"
                       type="text"
-                      label="Widget"
+                      label="Widget*"
                       placeholder="Boxalino Widget">
+            </sw-field>
+        {% endblock %}
+
+        {% block sw_cms_element_narrative_config_sidebar %}
+            <sw-field type="switch"
+                      bordered
+                      label="Sidebar Layout"
+                      v-model="element.config.sidebar.value">
             </sw-field>
         {% endblock %}
 
         {% block sw_cms_element_narrative_config_hitCount %}
             <sw-field  type="text" v-model="element.config.hitCount.value"
-                       label="Returned Matches (nr)"
-                       placeholder="Hits Count Value">
+                       label="Nr of returned products*"
+                       placeholder="Hit Count Value">
             </sw-field>
+        {% endblock %}
+
+        {% block sw_cms_element_narrative_config_groupBy %}
+            <sw-field type="text" v-model="element.config.groupBy.value"
+                      label="Group by (field name)*"
+                      placeholder="products_group_id">
+            </sw-field>
+        {% endblock %}
+
+        {% block sw_cms_element_narrative_config_applyRequestParams %}
+            <sw-boolean-radio-group v-model="element.config.applyRequestParams.value"
+                                    label="Apply Request Parameters"
+                                    labelOptionTrue="Yes, content updates on customer facet/sorting/filter select"
+                                    labelOptionFalse="No, content is independent of customer actions"
+                                    bordered>
+            </sw-boolean-radio-group>
         {% endblock %}
 
         {% block sw_cms_element_narrative_config_returnFields %}
@@ -22,35 +46,34 @@
             </sw-field>
         {% endblock %}
 
-        {% block sw_cms_element_narrative_config_groupBy %}
-            <sw-field type="text" v-model="element.config.groupBy.value"
-                      label="Group by (field name)"
-                      placeholder="id">
+        {% block sw_cms_element_narrative_config_filters %}
+            <sw-field type="text" v-model="element.config.filters.value"
+                      label="Filters (list, divided by comma (,))"
+                      placeholder="products_visibility=20">
             </sw-field>
         {% endblock %}
 
-        {% block sw_cms_element_narrative_config_filters %}
-            <sw-field type="text" v-model="element.config.filters.value"
-                      label="Filters (list, divided by comma (,)))"
-                      placeholder="products_visibility=30">
+        {% block sw_cms_element_narrative_config_categoryFilter %}
+            <sw-select-field placeholder="Category Filter Scope"
+                             v-model="element.config.categoryFilter.value"
+                             label="Category Filter">
+                <option value="root">Sales Channel Navigation Category</option>
+                <option value="navigation">Current Category</option>
+                <option value="custom">Custom category IDs</option>
+            </sw-select-field>
+        {% endblock %}
+
+        {% block sw_cms_element_narrative_config_categoryFilterList %}
+            <sw-field type="text" v-model="element.config.categoryFilterList.value"
+                      label="Category List for Filters (divided by comma(,))"
+                      placeholder="categoryId1,categoryId2">
             </sw-field>
         {% endblock %}
 
         {% block sw_cms_element_narrative_config_facets %}
             <sw-field type="text" v-model="element.config.facets.value"
-                      label="Facets (list, divided by comma (,)))"
-                      placeholder="products_brand=Brand1&category_id=CategoryId">
+                      label="Facets (list, divided by comma (,))">
             </sw-field>
-        {% endblock %}
-
-        {% block sw_cms_element_narrative_config_context %}
-            <sw-select-field placeholder="Element context on the page (listing, recommendation)"
-                             v-model="element.config.context.value"
-                             label="Context">
-                <option value="listing">Listing</option>
-                <option value="recommendation">Recommendation</option>
-                <option value="none">N/A</option>
-            </sw-select-field>
         {% endblock %}
     </div>
 {% endblock %}

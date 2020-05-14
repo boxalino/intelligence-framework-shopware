@@ -67,6 +67,12 @@ class ApiLoader
             $this->configuration->getRestApiEndpoint($salesChannelContext->getSalesChannel()->getId())
         );
 
+        if(!$this->apiCallService->isFallback())
+        {
+            /** this is a required step */
+            $this->apiCallService->getApiResponse()->getAccessorHandler()->setSalesChannelContext($salesChannelContext);
+        }
+
         return;
     }
 

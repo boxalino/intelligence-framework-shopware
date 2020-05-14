@@ -68,6 +68,11 @@ abstract class ContextAbstract implements ShopwareApiContextInterface
     protected $groupBy = "products_group_id";
 
     /**
+     * @var \ArrayObject
+     */
+    protected $properties;
+
+    /**
      * Listing constructor.
      *
      * @param RequestTransformerInterface $requestTransformer
@@ -77,6 +82,7 @@ abstract class ContextAbstract implements ShopwareApiContextInterface
         RequestTransformerInterface $requestTransformer,
         ParameterFactory $parameterFactory
     ) {
+        $this->properties = new \ArrayObject();
         $this->requestTransformer = $requestTransformer;
         $this->parameterFactory = $parameterFactory;
     }
@@ -101,13 +107,9 @@ abstract class ContextAbstract implements ShopwareApiContextInterface
         $this->getApiRequest()
             ->setReturnFields($this->getReturnFields())
             ->setGroupBy($this->getGroupBy())
-            ->setWidget($this->getWidget())
-            ->addFilters(
-                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FILTER)->add("category_id", $this->getContextNavigationId($request, $this->salesChannelContext)),
-                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FILTER)->addRange("products_visibility", $this->getContextVisibility(),1000),
-                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FILTER)->add("products_active", [1])
-            );
+            ->setWidget($this->getWidget());
 
+        $this->addFilters($request);
         if($this->getHitCount())
         {
             $this->getApiRequest()->setHitCount($this->getHitCount());
@@ -119,6 +121,21 @@ abstract class ContextAbstract implements ShopwareApiContextInterface
     abstract function getContextNavigationId(Request $request, SalesChannelContext $salesChannelContext): array;
     abstract function getContextVisibility() : int;
     abstract function getReturnFields() : array;
+
+    /**
+     * Adding general filters
+     *
+     * @param Request $request
+     */
+    protected function addFilters(Request $request) : void
+    {
+        $this->getApiRequest()
+            ->addFilters(
+                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FILTER)->add("category_id", $this->getContextNavigationId($request, $this->salesChannelContext)),
+                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FILTER)->addRange("products_visibility", $this->getContextVisibility(),1000),
+                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FILTER)->add("products_active", [1])
+            );
+    }
 
     /**
      * @param string $widget
@@ -226,6 +243,38 @@ abstract class ContextAbstract implements ShopwareApiContextInterface
     {
         $this->offset = $offset;
         return $this;
+    }
+
+    /**
+     * @param string $property
+     * @param string | bool $value
+     * @return $this
+     */
+    public function set(string $property, $value)
+    {
+        $this->properties->offsetSet($property, $value);
+        return $this;
+    }
+
+    /**
+     * @param string $property
+     * @return string | bool | void
+     */
+    public function getProperty(string $property)
+    {
+        if($this->properties->offsetExists($property))
+        {
+            return $this->properties->offsetGet($property);
+        }
+    }
+
+    /**
+     * @param string $property
+     * @return bool
+     */
+    public function has(string $property) : bool
+    {
+        return $this->properties->offsetExists($property);
     }
 
 }

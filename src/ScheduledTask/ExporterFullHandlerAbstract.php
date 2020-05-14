@@ -1,7 +1,7 @@
 <?php
 namespace  Boxalino\IntelligenceFramework\ScheduledTask;
 
-use Boxalino\IntelligenceFramework\Service\Exporter\ExporterFull;
+use Boxalino\IntelligenceFramework\Service\Exporter\ExporterFull as FullDataExporter;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
@@ -13,7 +13,7 @@ use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 abstract class ExporterFullHandlerAbstract extends ScheduledTaskHandler
 {
     /**
-     * @var ExporterFull
+     * @var FullDataExporter
      */
     protected $exporterFull;
 
@@ -30,7 +30,7 @@ abstract class ExporterFullHandlerAbstract extends ScheduledTaskHandler
     public function __construct(
         EntityRepositoryInterface $scheduledTaskRepository,
         LoggerInterface $logger,
-        ExporterFull $fullExporter
+        FullDataExporter $fullExporter
     ){
         parent::__construct($scheduledTaskRepository);
         $this->exporterFull = $fullExporter;

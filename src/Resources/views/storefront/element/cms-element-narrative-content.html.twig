@@ -1,6 +1,10 @@
 {# Narrative template un-attached from base (ex: sample for autocomplete content, in-block children renderings, etc) #}
+{% set blocks = element.data.blocks %}
+{% if blocks is null %}
+    {% set blocks = page.blocks %}
+{% endif %}
 {% block boxalino_narrative_content %}
-    {% for bxblock in page.blocks %}
+    {% for bxblock in blocks %}
         {% set narrativeContent = {'block' : bxblock } %}
         {% sw_include bxblock.template with narrativeContent %}
     {% endfor %}

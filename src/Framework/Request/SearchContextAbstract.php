@@ -92,7 +92,7 @@ abstract class SearchContextAbstract
     }
 
     /**
-     * Enforce a dependency type for the ItemContext requests
+     * Enforce a dependency type for the SearchContext requests
      *
      * @param RequestDefinitionInterface $requestDefinition
      * @return self | Error

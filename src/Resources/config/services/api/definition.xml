@@ -20,7 +20,7 @@
                  parent="Boxalino\IntelligenceFramework\Service\Api\Request\RequestDefinitionInterface"/>
 
         <!-- Shopware6 ListingRequestDefinition reuse for listing requests -->
-        <service id="boxalino.api.request.definition.listing"
+        <service id="Boxalino\IntelligenceFramework\Service\Api\Request\Definition\ListingRequestDefinitionInterface"
                  class="Boxalino\IntelligenceFramework\Service\Api\Request\Definition\ListingRequestDefinition"
                  parent="Boxalino\IntelligenceFramework\Service\Api\Request\RequestDefinitionInterface"/>
 
