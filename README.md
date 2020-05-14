@@ -9,7 +9,8 @@ The current repository is used as a framework layer and includes:
 3. Tracker*
 
 By adding this package to your Shopware6 setup, your store data can be exported to Boxalino.
-In order to use the API for generic functionalities (search, autocomplete, recommendations, etc), please check the integration repository.
+In order to use the API for generic functionalities (search, autocomplete, recommendations, etc), please check the integration repository
+https://github.com/boxalino/intelligence-integration-shopware
 
 ## Documentation
 
