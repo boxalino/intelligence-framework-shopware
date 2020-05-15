@@ -110,10 +110,8 @@ abstract class ContextAbstract implements ShopwareApiContextInterface
             ->setWidget($this->getWidget());
 
         $this->addFilters($request);
-        if($this->getHitCount())
-        {
-            $this->getApiRequest()->setHitCount($this->getHitCount());
-        }
+        $this->addContextParameters($request);
+
 
         return $this->getApiRequest();
     }
@@ -121,6 +119,21 @@ abstract class ContextAbstract implements ShopwareApiContextInterface
     abstract function getContextNavigationId(Request $request, SalesChannelContext $salesChannelContext): array;
     abstract function getContextVisibility() : int;
     abstract function getReturnFields() : array;
+
+    /**
+     * Adding context parameters per integration use-case
+     * (for custom integrations)
+     *
+     * @param Request $request
+     * @return void
+     */
+    protected function addContextParameters(Request $request) : void
+    {
+        if($this->getHitCount())
+        {
+            $this->getApiRequest()->setHitCount($this->getHitCount());
+        }
+    }
 
     /**
      * Adding general filters
@@ -131,9 +144,12 @@ abstract class ContextAbstract implements ShopwareApiContextInterface
     {
         $this->getApiRequest()
             ->addFilters(
-                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FILTER)->add("category_id", $this->getContextNavigationId($request, $this->salesChannelContext)),
-                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FILTER)->addRange("products_visibility", $this->getContextVisibility(),1000),
-                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FILTER)->add("products_active", [1])
+                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FILTER)
+                    ->add("category_id", $this->getContextNavigationId($request, $this->salesChannelContext)),
+                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FILTER)
+                    ->addRange("products_visibility", $this->getContextVisibility(),1000),
+                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FILTER)
+                    ->add("products_active", [1])
             );
     }
 

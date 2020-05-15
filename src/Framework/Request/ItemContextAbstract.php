@@ -82,7 +82,8 @@ abstract class ItemContextAbstract
             {
                 $this->getApiRequest()
                     ->addParameters(
-                        $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_USER)->add($type, $ids)
+                        $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_USER)
+                            ->add($type, $ids)
                     );
             }
         }

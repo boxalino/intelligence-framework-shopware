@@ -53,16 +53,16 @@ trait ResponseHydratorTrait
             {
                 $handler = $this->getAccessorHandler()->getAccessor($propertyName);
                 $objectProperty = $this->getAccessorHandler()->getAccessorSetter($propertyName);
-                if(empty($value))
-                {
-                    $object->set($objectProperty, $handler);
-                    continue;
-                }
-
                 /** the facets is returned as a list/[] instead of a model itself */
                 if($propertyName === 'bx-facets')
                 {
                     $object->set($objectProperty, $value);
+                    continue;
+                }
+
+                if(empty($value))
+                {
+                    $object->set($objectProperty, $handler);
                     continue;
                 }
 

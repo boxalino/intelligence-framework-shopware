@@ -25,7 +25,7 @@ class ResponseDefinition implements ResponseDefinitionInterface
      * If the facets are declared on a certain position, they are isolated in a specific block
      * All the other content is located under "blocks"
      */
-    const BOXALINO_RESPONSE_POSITION = ["left", "right", "main", "top", "bottom"];
+    const BOXALINO_RESPONSE_POSITION = ["left", "right", "sidebar", "top", "bottom"];
 
     /**
      * @var string
@@ -57,6 +57,14 @@ class ResponseDefinition implements ResponseDefinitionInterface
      */
     protected $blocks = null;
 
+    /**
+     * The visual elements declared with a property "position" different than "main" or none, will have their own
+     * RESPONSE SEGMENT by which they can be accessed
+     *
+     * @var array
+     */
+    protected $segments = ["top", "right", "bottom", "left"];
+
     public function __construct(LoggerInterface $logger, AccessorHandlerInterface $accessorHandler)
     {
         $this->logger = $logger;
@@ -70,31 +78,23 @@ class ResponseDefinition implements ResponseDefinitionInterface
      * @param array $params
      * @return array
      */
-    public function __call(string $method, array $params = [])
+    public function __call(string $method, array $params = []) : ?\ArrayIterator
     {
         preg_match('/^(get)(.*?)$/i', $method, $matches);
         $prefix = $matches[1] ?? '';
         $element = $matches[2] ?? '';
         $element = strtolower($element);
-        if ($prefix == 'get') {
-
-            if (in_array($element, self::BOXALINO_RESPONSE_POSITION))
+        if ($prefix == 'get')
+        {
+            if (in_array($element, $this->segments))
             {
-                try {
-                    $content = [];
-                    foreach($this->get()->$element as $block)
-                    {
-                        $content[] = $this->getBlockObject($block);
-                    }
-                    return $content;
-                } catch (\Exception $error)
-                {
-                    return [];
-                }
+                return $this->getContentByType($element);
             }
 
             throw new UndefinedMethodError("BoxalinoResponseAPI: the requested method $method is not supported by the Boxalino API ResponseServer");
         }
+
+        return null;
     }
 
     /**
@@ -152,7 +152,7 @@ class ResponseDefinition implements ResponseDefinitionInterface
     public function isCorrectedSearchQuery() : bool
     {
         try{
-           return (bool) $this->get()->system->correctedSearchQuery;
+            return (bool) $this->get()->system->correctedSearchQuery;
         } catch(\Exception $exception)
         {
             return false;
@@ -234,20 +234,34 @@ class ResponseDefinition implements ResponseDefinitionInterface
     {
         if(is_null($this->blocks))
         {
-            $this->blocks = new \ArrayIterator();
-            $blocks = $this->get()->blocks;
-            try{
-                foreach($blocks as $block)
-                {
-                    $this->blocks->append($this->getBlockObject($block));
-                }
-            } catch(\Exception $exception)
-            {
-                $this->logger->warning("BoxalinoResponseAPI: Something went wrong during BLOCKS generation: " . $exception->getMessage());
-            }
+            $this->blocks = $this->getContentByType("blocks");
         }
 
         return $this->blocks;
+    }
+
+    /**
+     * @param string $type
+     * @return \ArrayIterator
+     */
+    public function getContentByType(string $type) : \ArrayIterator
+    {
+        $content = new \ArrayIterator();
+        try{
+            $blocks = $this->get()->$type;
+            foreach($blocks as $block)
+            {
+                $content->append($this->getBlockObject($block));
+            }
+        } catch (\ErrorException $error)
+        {
+            /** there is no layout position for the narrative, not an issue */
+        } catch (\Exception $error)
+        {
+            $this->logger->warning("BoxalinoResponseAPI: Something went wrong during content extract for $type: " . $error->getMessage());
+        }
+
+        return $content;
     }
 
     /**
@@ -334,4 +348,30 @@ class ResponseDefinition implements ResponseDefinitionInterface
         return $this->accessorHandler;
     }
 
+    /**
+     * @param array $segments
+     * @return $this
+     */
+    public function addResponseSegments(array $segments)
+    {
+        foreach($segments as $segment)
+        {
+            if(isset($this->segments[$segment]))
+            {
+                continue;
+            }
+
+            $this->segments[] = $segment;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return array|string[]
+     */
+    public function getResponseSegments() : array
+    {
+        return $this->segments;
+    }
 }

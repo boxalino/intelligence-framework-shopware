@@ -89,4 +89,19 @@ interface ResponseDefinitionInterface
      */
     public function getAccessorHandler(): AccessorHandlerInterface;
 
+    /**
+     * Adding response positions for your integration
+     * (ex: top, left, bottom, right,..)
+     * This will make your content accessible in a structured way as the default "blocks" are accessed
+     *
+     * @param array $positions
+     * @return mixed
+     */
+    public function addResponseSegments(array $positions);
+
+    /**
+     * @return array|string[]
+     */
+    public function getResponseSegments() : array;
+
 }

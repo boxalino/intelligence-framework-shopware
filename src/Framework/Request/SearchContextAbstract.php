@@ -56,6 +56,19 @@ abstract class SearchContextAbstract
     }
 
     /**
+     * @param Request $request
+     * @return void
+     */
+    protected function addContextParameters(Request $request) : void
+    {
+        parent::addContextParameters($request);
+        $this->getApiRequest()->addHeaderParameters(
+            $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_HEADER)
+                ->add("search", $request->get("search", ""))
+        );
+    }
+
+    /**
      * @return int|null
      */
     public function getSubPhrasesCount(): ?int

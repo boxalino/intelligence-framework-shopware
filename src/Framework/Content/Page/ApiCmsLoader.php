@@ -1,8 +1,11 @@
 <?php declare(strict_types=1);
 namespace Boxalino\IntelligenceFramework\Framework\Content\Page;
 
+use Boxalino\IntelligenceFramework\Framework\Content\CreateFromTrait;
 use Boxalino\IntelligenceFramework\Framework\Content\Listing\ApiCmsModel;
 use Boxalino\IntelligenceFramework\Service\Api\ApiCallServiceInterface;
+use Boxalino\IntelligenceFramework\Service\Api\Response\Accessor\Block;
+use Boxalino\IntelligenceFramework\Service\ErrorHandler\UndefinedPropertyError;
 use Shopware\Core\Content\Cms\Aggregate\CmsSlot\CmsSlotEntity;
 use Shopware\Core\Framework\Struct\Struct;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -17,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ApiCmsLoader extends ApiLoader
 {
+    use CreateFromTrait;
 
     /**
      * Loads the content of an API Response page
@@ -33,9 +37,14 @@ class ApiCmsLoader extends ApiLoader
 
         $content = new ApiCmsModel();
         $content->setBlocks($this->apiCallService->getApiResponse()->getBlocks())
+            ->setLeft($this->apiCallService->getApiResponse()->getLeft())
+            ->setTop($this->apiCallService->getApiResponse()->getTop())
+            ->setBottom($this->apiCallService->getApiResponse()->getBottom())
+            ->setRight($this->apiCallService->getApiResponse()->getRight())
             ->setRequestId($this->apiCallService->getApiResponse()->getRequestId())
             ->setGroupBy($this->getGroupBy())
             ->setVariantUuid($this->getVariantUuid())
+            ->setNavigationId($request->get("navigationId", $salesChannelContext->getSalesChannel()->getNavigationCategoryId()))
             ->setTotalHitCount($this->apiCallService->getApiResponse()->getHitCount());
 
         return $content;
@@ -71,6 +80,63 @@ class ApiCmsLoader extends ApiLoader
                 $this->apiContextInterface->set($key, $configuration['value']);
             }
         }
+    }
+
+    /**
+     * Replicates the narrative content in order to generate the top/bottom/right/left slots
+     *
+     * @param Struct $apiCmsModel
+     * @return Struct
+     */
+    public function createSectionFrom(Struct $apiCmsModel, string $position) : Struct
+    {
+        if(in_array($position, $this->apiCallService->getApiResponse()->getResponseSegments()) && $apiCmsModel instanceof ApiCmsModel)
+        {
+            /** @var ApiCmsModel $segmentNarrativeBlock */
+            $segmentNarrativeBlock = $this->createFromObject($apiCmsModel, ['blocks', $position]);
+            $getterFunction = "get".ucfirst($position);
+            $setterFunction = "set".ucfirst($position);
+            $segmentNarrativeBlock->setBlocks($apiCmsModel->$getterFunction());
+            $segmentNarrativeBlock->$setterFunction(new \ArrayIterator());
+
+            return $segmentNarrativeBlock;
+        }
+
+        return new ApiCmsModel();
+    }
+
+    /**
+     * This function can be used to access parts of the response\
+     * and isolate them in different sections
+     * ex: a single narrative request on a page with 3 sections
+     * @param string $property
+     * @param string $value
+     * @param string $segment
+     * @return \ArrayIterator
+     */
+    public function getBlocksByPropertyValue(string $property, string $value, string $segment = 'blocks') : \ArrayIterator
+    {
+        $newSectionBlocks = new \ArrayIterator();
+        $responseSegmentGetter = "get" . ucfirst($segment);
+        $blocks = $this->apiCallService->getApiResponse()->$responseSegmentGetter();
+        /** @var Block $block */
+        foreach($blocks as $index => $block)
+        {
+            try{
+                $functionName = "get".ucfirst($property);
+                $propertyValue = $block->$functionName();
+                if($propertyValue[0] == $value)
+                {
+                    $newSectionBlocks->append($block);
+                    $blocks->offsetUnset($index);
+                }
+            } catch (UndefinedPropertyError $exception)
+            {
+                continue;
+            }
+        }
+
+        return $newSectionBlocks;
     }
 
 }

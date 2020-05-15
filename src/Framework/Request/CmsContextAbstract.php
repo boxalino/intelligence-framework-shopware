@@ -8,7 +8,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Boxalino Cms Request handler
- * Allows to set the nr of subphrases and products returned on each subphrase hit
+ * Allows to set the configurations from the Boxalino Narrative CMS block
+ * (facets, filters, sidebar, etc_
  *
  * @package Boxalino\IntelligenceFramework\Framework\Request
  */
@@ -16,6 +17,32 @@ abstract class CmsContextAbstract
     extends ListingContextAbstract
     implements ShopwareApiContextInterface, ListingContextInterface
 {
+
+    /**
+     * @param Request $request
+     * @return void
+     */
+    protected function addContextParameters(Request $request) : void
+    {
+        parent::addContextParameters($request);
+
+        $params=$request->attributes->get('_route_params');
+        if(isset($params['navigationId']))
+        {
+            $this->getApiRequest()->addHeaderParameters(
+                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_HEADER)
+                    ->add("navigationId", $params['navigationId'])
+            );
+        }
+
+        if($this->getProperty("sidebar"))
+        {
+            $this->getApiRequest()->addHeaderParameters(
+                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_HEADER)
+                    ->add("position", "sidebar")
+            );
+        }
+    }
 
     /**
      * Adding general filters
@@ -29,15 +56,18 @@ abstract class CmsContextAbstract
         $this->getApiRequest()
             ->setHitCount($this->getHitCount())
             ->addFilters(
-                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FILTER)->addRange("products_visibility", $this->getContextVisibility(), 1000),
-                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FILTER)->add("products_active", [1])
+                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FILTER)
+                    ->addRange("products_visibility", $this->getContextVisibility(), 1000),
+                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FILTER)
+                    ->add("products_active", [1])
             );
 
         $categoryIds = $this->getContextNavigationId($request, $this->salesChannelContext);
         if(!empty($categoryIds))
         {
             $this->getApiRequest()->addFilters(
-                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FILTER)->add("category_id", $categoryIds)
+                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_FILTER)
+                    ->add("category_id", $categoryIds)
             );
         }
 

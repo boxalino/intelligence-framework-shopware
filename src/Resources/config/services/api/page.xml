@@ -37,19 +37,6 @@
             <argument type="service" id="sales_channel.product.repository"/>
         </service>
 
-        <!-- Shopware6 - Boxalino sorting model (used in layout block definition) -->
-        <service id="Boxalino\IntelligenceFramework\Framework\Content\Listing\ApiSortingModel" public="true">
-            <argument type="service" id="Shopware\Core\Content\Product\SalesChannel\Listing\ProductListingSortingRegistry"/>
-            <call method="add">
-                <argument type="collection">
-                    <argument key="product.listingPrices">discountedPrice</argument>
-                    <argument key="product.name">title</argument>
-                    <argument key="product.id">products_group_id</argument>
-                    <argument key="_score">score</argument>
-                </argument>
-            </call>
-        </service>
-
         <!-- Shopware6 - Boxalino facet handler model (used in layout block definition) -->
         <service id="Boxalino\IntelligenceFramework\Framework\Content\Listing\ApiFacetModel" public="true">
             <argument type="service" id="Doctrine\DBAL\Connection"/>
