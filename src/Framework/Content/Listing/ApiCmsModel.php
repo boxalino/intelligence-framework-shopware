@@ -3,6 +3,12 @@ namespace Boxalino\IntelligenceFramework\Framework\Content\Listing;
 
 use Shopware\Core\Framework\Struct\Struct;
 
+/**
+ * Class ApiCmsModel
+ * Model used for the Boxalino Narrative CMS block
+ *
+ * @package Boxalino\IntelligenceFramework\Framework\Content\Listing
+ */
 class ApiCmsModel extends Struct
 {
     /**
@@ -38,7 +44,22 @@ class ApiCmsModel extends Struct
     /**
      * @var \ArrayIterator
      */
-    protected $sidebar;
+    protected $left;
+
+    /**
+     * @var \ArrayIterator
+     */
+    protected $right;
+
+    /**
+     * @var \ArrayIterator
+     */
+    protected $bottom;
+
+    /**
+     * @var \ArrayIterator
+     */
+    protected $top;
 
     /**
      * @return \ArrayIterator
@@ -151,21 +172,74 @@ class ApiCmsModel extends Struct
     /**
      * @return \ArrayIterator
      */
-    public function getSidebar() : \ArrayIterator
+    public function getLeft(): \ArrayIterator
     {
-        return $this->sidebar;
+        return $this->left;
     }
 
     /**
-     * @param null $sidebar
+     * @param \ArrayIterator $left
      * @return ApiCmsModel
      */
-    public function setSidebar(\ArrayIterator $sidebar)
+    public function setLeft(\ArrayIterator $left): ApiCmsModel
     {
-        $this->sidebar = $sidebar;
+        $this->left = $left;
         return $this;
     }
 
+    /**
+     * @return \ArrayIterator
+     */
+    public function getRight(): \ArrayIterator
+    {
+        return $this->right;
+    }
+
+    /**
+     * @param \ArrayIterator $right
+     * @return ApiCmsModel
+     */
+    public function setRight(\ArrayIterator $right): ApiCmsModel
+    {
+        $this->right = $right;
+        return $this;
+    }
+
+    /**
+     * @return \ArrayIterator
+     */
+    public function getBottom(): \ArrayIterator
+    {
+        return $this->bottom;
+    }
+
+    /**
+     * @param \ArrayIterator $bottom
+     * @return ApiCmsModel
+     */
+    public function setBottom(\ArrayIterator $bottom): ApiCmsModel
+    {
+        $this->bottom = $bottom;
+        return $this;
+    }
+
+    /**
+     * @return \ArrayIterator
+     */
+    public function getTop(): \ArrayIterator
+    {
+        return $this->top;
+    }
+
+    /**
+     * @param \ArrayIterator $top
+     * @return ApiCmsModel
+     */
+    public function setTop(\ArrayIterator $top): ApiCmsModel
+    {
+        $this->top = $top;
+        return $this;
+    }
 
 
 }

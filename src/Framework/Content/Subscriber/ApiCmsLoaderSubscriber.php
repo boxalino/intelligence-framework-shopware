@@ -22,6 +22,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * If the Boxalino Narrative CMS block is being configured for a "sidebar layout",
  * the root block with section=sidebar will be appended to the sidebar section of the page
  *
+ * The class can be used as a base to be extended & customized
+ * (ex: adding segments of the narrative response to other sections of the Shopware Experience - top, bottom)
+ *
  * @package Boxalino\IntelligenceFramework\Framework\Content\Subscriber
  */
 class ApiCmsLoaderSubscriber implements EventSubscriberInterface
@@ -69,7 +72,7 @@ class ApiCmsLoaderSubscriber implements EventSubscriberInterface
         foreach($event->getResult() as $element)
         {
             /** @var CmsSectionEntity $section */
-            foreach($element->getSections() as $section)
+            foreach($element->getSections() as $sectionNr => $section)
             {
                 /** @var CmsBlockEntity $block */
                 foreach($section->getBlocks() as $block)
@@ -77,9 +80,13 @@ class ApiCmsLoaderSubscriber implements EventSubscriberInterface
                     try{
                         if($block->getType() == 'narrative')
                         {
-                            $data = $this->apiCmsLoader->load($event->getRequest(), $event->getSalesChannelContext(), $block->getSlots()->first());
-                            $block->getSlots()->first()->setData($data);
-                            $this->updateSidebar($data, $section, $block);
+                            $slot = $block->getSlots()->first();
+                            $narrativeResponse = $this->apiCmsLoader->load($event->getRequest(), $event->getSalesChannelContext(), $slot);
+                            $block->getSlots()->first()->setData($narrativeResponse);
+                            if($slot->getConfig()['sidebar']['value'])
+                            {
+                                $this->updateSidebar($narrativeResponse, $section, $block);
+                            }
                         }
                     } catch (\Throwable $exception)
                     {
@@ -102,7 +109,7 @@ class ApiCmsLoaderSubscriber implements EventSubscriberInterface
         {
             $slot = $this->createCmsSlotEntity($narrativeBlock, $data);
             $slots = $this->createCmsSlotCollection($slot);
-            $sidebarBlock = $this->createCmsBlockEntity($narrativeBlock, $slots, count($section->getBlocks()));
+            $sidebarBlock = $this->createCmsBlockEntity($narrativeBlock, $slots, "sidebar", count($section->getBlocks()));
 
             $section->getBlocks()->add($sidebarBlock);
         }
@@ -118,7 +125,7 @@ class ApiCmsLoaderSubscriber implements EventSubscriberInterface
         /** @var CmsSlotEntity $slot */
         $slot = $this->createFromObject($blockEntity->getSlots()->first(), ['data', '_uniqueIdentifier']);
         $slot->setUniqueIdentifier(uniqid("boxalino_narrative_"));
-        $slot->setData($this->apiCmsLoader->createSidebarFrom($slotData));
+        $slot->setData($this->apiCmsLoader->createSectionFrom($slotData, 'left'));
 
         return $slot;
     }
@@ -140,11 +147,11 @@ class ApiCmsLoaderSubscriber implements EventSubscriberInterface
      * @param int $position
      * @return Struct
      */
-    protected function createCmsBlockEntity(CmsBlockEntity $originalBlock, CmsSlotCollection $slots, int $position=0) : CmsBlockEntity
+    protected function createCmsBlockEntity(CmsBlockEntity $originalBlock, CmsSlotCollection $slots, string $sectionPosition, int $position=0) : CmsBlockEntity
     {
         /** @var CmsBlockEntity $block */
         $block = $this->createFromObject($originalBlock, ['data', '_uniqueIdentifier', 'sectionId', 'id']);
-        $block->setSectionPosition("sidebar");
+        $block->setSectionPosition($sectionPosition);
         $block->setUniqueIdentifier(uniqid("boxalino_sidebar_"));
         $block->setSectionId(uniqid());
         $block->setId(uniqid("boxalino_block_"));

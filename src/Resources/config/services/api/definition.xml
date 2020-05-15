@@ -23,7 +23,6 @@
         <service id="Boxalino\IntelligenceFramework\Service\Api\Request\Definition\ListingRequestDefinitionInterface"
                  class="Boxalino\IntelligenceFramework\Service\Api\Request\Definition\ListingRequestDefinition"
                  parent="Boxalino\IntelligenceFramework\Service\Api\Request\RequestDefinitionInterface"/>
-
     </services>
 
 </container>
