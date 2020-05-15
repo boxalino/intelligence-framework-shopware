@@ -160,7 +160,7 @@ class ApiFacetModel implements AccessorFacetModelInterface
     }
 
     /**
-     * Accessing property name from DB
+     * Accessing translation for the property name from DB
      *
      * @param string $propertyName
      * @return string
@@ -196,6 +196,8 @@ class ApiFacetModel implements AccessorFacetModelInterface
     }
 
     /**
+     * Accessing the property ID for the default channel
+     *
      * @param string $propertyName
      * @return false|string
      * @throws \Shopware\Core\Framework\Uuid\Exception\InvalidUuidException
@@ -216,6 +218,8 @@ class ApiFacetModel implements AccessorFacetModelInterface
     }
 
     /**
+     * Accessing the sales channel default language to get the property name
+     *
      * @return string
      * @throws \Shopware\Core\Framework\Uuid\Exception\InvalidUuidException
      */

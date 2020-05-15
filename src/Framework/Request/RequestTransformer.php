@@ -189,18 +189,23 @@ class RequestTransformer implements RequestTransformerInterface
      */
     public function addParameters(Request $request) : void
     {
+        /** header parameters accept a string as value */
         $this->requestDefinition->addHeaderParameters(
-            $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_HEADER)->add("User-Host", $request->getClientIp()),
-            $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_HEADER)->add("User-Agent", $request->headers->get('user-agent')),
-            $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_HEADER)->add("User-Referer", $request->headers->get('referer')),
-            $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_HEADER)->add("User-Url", $request->getUri())
-        )
-            ->addParameters(
-                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_USER)->add(SalesChannelRequest::ATTRIBUTE_DOMAIN_ID,
-                    [$request->attributes->get(SalesChannelRequest::ATTRIBUTE_DOMAIN_ID)]),
-                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_USER)->add(PlatformRequest::ATTRIBUTE_SALES_CHANNEL_ID,
-                    [$request->attributes->get(PlatformRequest::ATTRIBUTE_SALES_CHANNEL_ID)])
-            );
+            $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_HEADER)
+                ->add("User-Host", $request->getClientIp()),
+            $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_HEADER)
+                ->add("User-Agent", $request->headers->get('user-agent')),
+            $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_HEADER)
+                ->add("User-Referer", $request->headers->get('referer')),
+            $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_HEADER)
+                ->add("User-Url", $request->getUri()),
+            $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_HEADER)
+                ->add(SalesChannelRequest::ATTRIBUTE_DOMAIN_ID,
+                $request->attributes->get(SalesChannelRequest::ATTRIBUTE_DOMAIN_ID)),
+            $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_HEADER)
+                ->add(PlatformRequest::ATTRIBUTE_SALES_CHANNEL_ID,
+                $request->attributes->get(PlatformRequest::ATTRIBUTE_SALES_CHANNEL_ID))
+        );
 
         $queryString = $request->getQueryString();
         if(is_null($queryString))
@@ -229,7 +234,8 @@ class RequestTransformer implements RequestTransformerInterface
 
             $value = is_array($value) ? $value : [$value];
             $this->requestDefinition->addParameters(
-                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_USER)->add($param, $value)
+                $this->parameterFactory->get(ParameterFactory::BOXALINO_API_REQUEST_PARAMETER_TYPE_USER)
+                    ->add($param, $value)
             );
         }
     }

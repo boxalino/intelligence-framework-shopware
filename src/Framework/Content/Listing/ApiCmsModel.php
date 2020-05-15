@@ -31,6 +31,16 @@ class ApiCmsModel extends Struct
     protected $totalHitCount = 0;
 
     /**
+     * @var null | string
+     */
+    protected $navigationId = null;
+
+    /**
+     * @var \ArrayIterator
+     */
+    protected $sidebar;
+
+    /**
      * @return \ArrayIterator
      */
     public function getBlocks(): \ArrayIterator
@@ -119,5 +129,43 @@ class ApiCmsModel extends Struct
         $this->totalHitCount = $totalHitCount;
         return $this;
     }
+
+    /**
+     * @return string|null
+     */
+    public function getNavigationId(): ?string
+    {
+        return $this->navigationId;
+    }
+
+    /**
+     * @param string|null $navigationId
+     * @return ApiCmsModel
+     */
+    public function setNavigationId(?string $navigationId): ApiCmsModel
+    {
+        $this->navigationId = $navigationId;
+        return $this;
+    }
+
+    /**
+     * @return \ArrayIterator
+     */
+    public function getSidebar() : \ArrayIterator
+    {
+        return $this->sidebar;
+    }
+
+    /**
+     * @param null $sidebar
+     * @return ApiCmsModel
+     */
+    public function setSidebar(\ArrayIterator $sidebar)
+    {
+        $this->sidebar = $sidebar;
+        return $this;
+    }
+
+
 
 }
