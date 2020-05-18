@@ -1,5 +1,7 @@
 # Boxalino Intelligence Framework - Shopware6
 
+## IMPORTANT: This project is obsolete and has been replaced by https://github.com/boxalino/rtux-shopware
+
 ## Introduction
 For the Shopware6 integration, Boxalino comes with a divided approach: framework layer and integration layer.
 The current repository is used as a framework layer and includes:
